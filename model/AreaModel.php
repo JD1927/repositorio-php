@@ -1,25 +1,25 @@
 <?
 class AreaModel
 {
-  var $cod_area = "";
+  var $codArea = "";
   var $name = "";
   var $subarea = "";
 
-  function AreaModel($cod_area, $name, $subarea)
+  function AreaModel($codArea, $name, $subarea)
   {
-    $this->cod_area = $cod_area;
+    $this->codArea = $codArea;
     $this->name = $name;
     $this->subarea = $subarea;
   }
 
-  function getCod_Area()
+  function getCodArea()
   {
-    return $this->cod_area;
+    return $this->codArea;
   }
 
-  function setCod_Area($cod_area)
+  function setCodArea($codArea)
   {
-    $this->cod_area = $cod_area;
+    $this->codArea = $codArea;
   }
 
   function getName()

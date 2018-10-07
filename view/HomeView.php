@@ -58,66 +58,17 @@ if (!$_SESSION["name"]) {
 
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 class="h2">Áreas</h1>
+          <h1 class="h2">Repositorio</h1>
         </div>
         <div class="container">
-          <a href="AreaView.php" class="badge badge-dark">
-            <span>
-              <i class="fas fa-chevron-circle-left"></i>
-            </span> Volver</a>
-          <br>
-          <br>
-          <div class="card">
-            <h1 class="card-header" style="text-align: center;">Área</h1>
-            <div class="card-body">
-              <form name="areaForm" method="POST" action="Area.php">
-                <div class="form">
-                  <div class="form-group">
-                    <label for="lname">Código</label>
-                    <input type="text" class="form-control" name="cod" placeholder="Código de área" autocomplete="off">
-                  </div>
-                  <div class="form-group">
-                    <label for="lname">name</label>
-                    <input type="text" class="form-control" name="name" placeholder="name" autocomplete="off">
-                  </div>
-                  <div class="form-group">
-                    <label for="tele">Subárea</label>
-                    <input type="text" class="form-control" name="subarea" placeholder="Subárea" autocomplete="off">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <button type="submit" name="create" value="create" class="btn btn-success btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-user-plus"></i>
-                        </span> Crear</button>
-                    </div>
-                    <div class="col-md-6">
-                      <button type="submit" name="read" value="read" class="btn btn-primary btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-search"></i>
-                        </span> Consultar</button>
-                    </div>
-                  </div>
-                  <br>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <button type="submit" name="update" value="update" class="btn btn-dark btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-wrench"></i>
-                        </span> Actualizar</button>
-                    </div>
-                    <div class="col-md-6">
-                      <button type="submit" name="delete" value="delete" class="btn btn-danger btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-trash"></i>
-                        </span> Eliminar</button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
+          <div class="jumbotron">
+            <h1 class="display-3">¡Contenidos de aprendizaje!</h1>
+            <hr class="my-4">
+            <p class="lead">
+              Es una plataforma interactiva donde podrás utilizar excelentes contenidos de aprendizaje
+              y usar algunos materiales de estudio tales como: archivos de texto, sitios web, imágenes, videos, entre
+              otros.
+            </p>
           </div>
         </div>
       </main>

@@ -12,7 +12,7 @@ class CtrArea
   function create()
   {
 
-    $cod = $this->objArea->getCod_Area();
+    $cod = $this->objArea->getCodArea();
     $name = $this->objArea->getName();
     $subarea = $this->objArea->getSubarea();
 
@@ -23,7 +23,7 @@ class CtrArea
 
 		//--------------Se ejecuta Comando SQL-------------------------
 
-    $select = "INSERT into area (IDAREA,NOMBRE,FKIDAREA) values (" . $cod . ",'" . $name . "',NULL)";
+    $select = "INSERT into area (IDAREA,name,FKIDAREA) values (" . $cod . ",'" . $name . "',NULL)";
     $recordSet = $objConnection->executeSQL($bd, $select);
     $objConnection->close($enlace);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -56,7 +56,7 @@ class CtrArea
     $mat[0][0] = 3;
     while ($registro) {
       $mat[$i][1] = $registro['IDAREA'];
-      $mat[$i][2] = $registro['NOMBRE'];
+      $mat[$i][2] = $registro['name'];
       $mat[$i][3] = $registro['FKIDAREA'];
 
       $registro = mysql_fetch_array($recordSet);
@@ -69,7 +69,7 @@ class CtrArea
   }
   function update()
   {
-    $cod = $this->objArea->getCod_Area();
+    $cod = $this->objArea->getCodArea();
     $name = $this->objArea->getName();
     $subarea = $this->objArea->getSubarea();
         
@@ -85,7 +85,7 @@ class CtrArea
     if ($subarea == '') {
       $subarea = null;
     }
-    $select = "UPDATE AREA set NOMBRE='" . $name . "', FKIDAREA=" . $subarea . " where IDAREA =" . $cod . "";
+    $select = "UPDATE AREA set name='" . $name . "', FKIDAREA=" . $subarea . " where IDAREA =" . $cod . "";
     $recordSet = $objConnection->executeSQL($bd, $select);
     $objConnection->close($enlace);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -99,7 +99,7 @@ class CtrArea
   }
   function delete()
   {
-    $cod = $this->objArea->getCod_Area();
+    $cod = $this->objArea->getCodArea();
 
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
@@ -126,7 +126,7 @@ class CtrArea
   }
   function read()
   {
-    $cod = $this->objArea->getCod_Area();
+    $cod = $this->objArea->getcodArea();
 
     $bd = "repositorio";
     $objConnection = new CtrConnection();
@@ -141,9 +141,9 @@ class CtrArea
 
     $registro = mysql_fetch_array($recordSet);
 
-    $this->objArea->setCod_Area($registro['IDAREA']);
-    $this->objArea->setname($registro['name']);
-    $this->objArea->setsubarea($registro['IDFKAREA']);
+    $this->objArea->setCodArea($registro['IDAREA']);
+    $this->objArea->setName($registro['NAME']);
+    $this->objArea->setSubarea($registro['IDFKAREA']);
 
     $objConnection->close($enlace);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -164,7 +164,7 @@ class CtrArea
         // $bd="facturas";
         // $objConnection=new CtrConnection();
         // $enlace=$objConnection->connect('localhost',$bd,'root','');
-        // $select="select * from Usuarios";
+        // $select="select * from UserModel";
         //       $recordSet=$objConnection->executeSQL($bd,$select);
 
         // // LA FUNCI�N  mysql_num_rows DEVUELVE EL N�MERO DE REGISTROS DEL RECORDSET
@@ -181,7 +181,7 @@ class CtrArea
         //       while ($registro = mysql_fetch_array($recordSet)){
 	    //       $i=$i+1;
         //       $mat[$i][0]=  $registro['usuario'];
-        //       $mat[$i][1]=  $registro['contrasena'];
+        //       $mat[$i][1]=  $registro['password'];
 
         //        }
 
@@ -200,14 +200,14 @@ class CtrArea
 //             $bd="facturas";
 //             $enlace=$objConnection->connect('localhost',$bd,'root','');
 
-//             $select= "select * from Usuarios where usuarios.Usuario='" . $this->objUsuario->getNomUsuario().
-//              "' and usuarios.contrasena= '" . $this->objUsuario->getContrasena(). "'";
+//             $select= "select * from UserModel where UserModel.Usuario='" . $this->objUsuario->getNomUsuario().
+//              "' and UserModel.password= '" . $this->objUsuario->getpassword(). "'";
 
 //              try{
 //                  $recordSet=$objConnection->executeSQL($bd,$select);
 //                  $registro = mysql_fetch_array($recordSet);
 //                  $objUsuario1->setNomUsuario($registro['usuario']);
-//                  $objUsuario1->setContrasena($registro['contrasena']);
+//                  $objUsuario1->setpassword($registro['password']);
 // ;
 //                 }
 //          	catch (Exception $e)
@@ -217,9 +217,9 @@ class CtrArea
 //                  $objConnection->close($enlace);
 
 //             if ($this->objUsuario->getNomUsuario()==$objUsuario1->getNomUsuario() &&
-//                $this->objUsuario->getContrasena()==$objUsuario1->getContrasena()  &&
+//                $this->objUsuario->getpassword()==$objUsuario1->getpassword()  &&
 //                $this->objUsuario->getNomUsuario() != "" &&
-//                $this->objUsuario->getContrasena() != ""){
+//                $this->objUsuario->getpassword() != ""){
 //                  $esValido = true;
 //             }
 //             else
