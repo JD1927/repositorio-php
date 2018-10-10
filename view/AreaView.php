@@ -1,7 +1,115 @@
 <?php
+error_reporting(0);
 session_start();
 if (!$_SESSION["name"]) {
   header('Location: index.php');
+}
+//Incluye código 
+include("../model/AreaModel.php");
+include("../control/CtrArea.php");
+include("../control/CtrConnection.php");
+
+//Listar áreas
+$objArea = new AreaModel(null, null, null);
+$objCtrArea = new CtrArea($objArea);
+$mat = $objCtrArea->area_list();
+$length = count($mat);
+
+  //create
+if ($_POST["create"] == "create") {
+
+  try {
+    //setting values
+    $name = $_POST["name"];
+    $subarea = $_POST["subarea"];
+    $cod = $_POST["cod"];
+
+    $objArea = new AreaModel($cod, $name, $subarea);
+    $objCtrArea = new CtrArea($objArea);
+
+    $objCtrArea->create();
+    $mat = $objCtrArea->area_list();
+    $length = count($mat);
+  } catch (Exception $exp) {
+    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  }
+
+}
+  //select
+if ($_POST["read"] == "read") {
+
+  try {
+    //setting values
+    $cod = $_POST["cod"];
+    $objArea = new AreaModel($cod, $name, $subarea);
+    $objCtrArea = new CtrArea($objArea);
+
+
+    if ($objCtrArea->read()) {
+      echo "<center> <h1>SE HA REALIZADO LA CONSULTA</h1></center>";
+      echo $objArea->getcodArea() . "\n";
+      echo $objArea->getname() . "\n";
+      echo $objArea->getsubarea() . "\n";
+
+
+    } else {
+      echo "<center> <h1>NO SE HA PODIDO REALIZAR LA CONSULTA</h1></center>";
+    }
+  } catch (Exception $exp) {
+    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  }
+
+}
+  //update
+if ($_POST["update"] == "update") {
+  try {
+    //setting values
+    $name = $_POST["name"];
+    $subarea = $_POST["subarea"];
+    $cod = $_POST["cod"];
+
+    $objArea = new AreaModel($cod, $name, $subarea);
+    $objCtrArea = new CtrArea($objArea);
+
+
+
+    if (!$objCtrArea->update()) {
+      echo "<center> <h1>SE HA MODIFICADO CON EXITO</h1></center>";
+    } else {
+      echo "<center> <h1>NO SE HA ENCONTRADO EL AREA INGRESADA</h1></center>";
+    }
+
+    $mat = $objCtrArea->area_list();
+    $length = count($mat);
+
+  } catch (Exception $exp) {
+    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  }
+
+}
+  //delete
+if ($_POST["delete"] == "delete") {
+
+  try {
+
+    $cod = $_POST["cod"];
+
+    $objArea = new AreaModel($cod, $name, $subarea);
+    $objCtrArea = new CtrArea($objArea);
+
+    if (!$objCtrArea->delete()) {
+      echo "<center> <h1>SE HA BORRADO CON EXITO DE LA BASE DE DATOS</h1></center>";
+    } else {
+      echo "<center> <h1>NO SE HA ENCONTRADO NADA CON ESTE AREA</h1></center>";
+    }
+
+    $mat = $objCtrArea->area_list();
+    $length = count($mat);
+
+  } catch (Exception $exp) {
+    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  }
+
 }
 ?>
 <!DOCTYPE html>
@@ -57,72 +165,89 @@ if (!$_SESSION["name"]) {
       </nav>
 
       <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 class="h2">Áreas</h1>
-        </div>
         <div class="container">
-          <a href="AreaView.php" class="badge badge-dark">
-            <span>
-              <i class="fas fa-chevron-circle-left"></i>
-            </span> Volver</a>
-          <br>
-          <br>
           <div class="card">
-            <h1 class="card-header" style="text-align: center;">Área</h1>
+          <div class="card-header" style="text-align: center;"><h4>Áreas</h4></div>
             <div class="card-body">
-              <form name="areaForm" method="POST" action="Area.php">
-                <div class="form">
+              <form name="areaForm" method="POST" action="AreaView.php">
+                <div class="row">
+                  <div class="col-md-6">
+                  <div class="form">
                   <div class="form-group">
-                    <label for="lname">Código</label>
+                    <label for="cod">Código</label>
                     <input type="text" class="form-control" name="cod" placeholder="Código de área" autocomplete="off">
                   </div>
                   <div class="form-group">
-                    <label for="lname">name</label>
-                    <input type="text" class="form-control" name="name" placeholder="name" autocomplete="off">
+                    <label for="name">Nombre</label>
+                    <input type="text" class="form-control" name="name" placeholder="Nombre del área" autocomplete="off">
                   </div>
                   <div class="form-group">
-                    <label for="tele">Subárea</label>
+                    <label for="subarea">Subárea</label>
                     <input type="text" class="form-control" name="subarea" placeholder="Subárea" autocomplete="off">
                   </div>
                 </div>
-                <div class="form-group">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <button type="submit" name="create" value="create" class="btn btn-success btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-user-plus"></i>
-                        </span> Crear</button>
-                    </div>
-                    <div class="col-md-6">
-                      <button type="submit" name="read" value="read" class="btn btn-primary btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-search"></i>
-                        </span> Consultar</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="row">
+
+                          <button type="submit" name="create" value="create" class="btn btn-success btn-block">
+                            <span>
+                              <i class="fas fa-user-plus"></i>
+                            </span> Crear</button>
+                        
+                          <button type="submit" name="read" value="read" class="btn btn-primary btn-block">
+                            <span>
+                              <i class="fas fa-search"></i>
+                            </span> Consultar</button>
+                        
+                          <button type="submit" name="update" value="update" class="btn btn-dark btn-block">
+                            <span>
+                              <i class="fas fa-wrench"></i>
+                            </span> Actualizar</button>
+                        
+                          <button type="submit" name="delete" value="delete" class="btn btn-danger btn-block">
+                            <span>
+                              <i class="fas fa-trash"></i>
+                            </span> Eliminar</button>
+                        
                     </div>
                   </div>
-                  <br>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <button type="submit" name="update" value="update" class="btn btn-dark btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-wrench"></i>
-                        </span> Actualizar</button>
-                    </div>
-                    <div class="col-md-6">
-                      <button type="submit" name="delete" value="delete" class="btn btn-danger btn-lg btn-block">
-                        <span>
-                          <i class="fas fa-trash"></i>
-                        </span> Eliminar</button>
-                    </div>
-                  </div>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           </div>
+          <div class="container">
+            <?php
+
+            echo "<div class=''>
+                  <table class='table table-hover table-response'>
+                    <thead class='thead-dark'>
+                      <tr>
+                          <th scope='col'>Código Área</th>
+                          <th scope='col'>Nombre</th>
+                          <th scope='col'>Subárea</th>
+                      </tr>
+                    </thead>
+                    <tbody>";
+            for ($i = 0; $i < $length; $i++) {
+              echo "<tr>
+                        <td scope='row'>" . $mat[$i][1] . "</td>
+                        <td scope='row'> " . $mat[$i][2] . "</td>
+                        <td scope='row'>" . (is_null($mat[$i][3])?'No tiene':$mat[$i][3]) . "</td>
+                      </tr>";
+            }
+            echo "</tbody>  
+                </table>
+                </div>";
+
+            ?>
         </div>
+
       </main>
     </div>
   </div>
+
 
   <!-- Bootstrap core JavaScript
     ================================================== -->

@@ -33,7 +33,7 @@ class UserModel
 
 	function getRol()
 	{
-		return this->rol;
+		return $this->rol;
 	}
 
 	function setRol($rol){
