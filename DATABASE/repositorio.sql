@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: localhost
--- Tiempo de generación: 07-10-2018 a las 04:10:31
+-- Tiempo de generación: 11-10-2018 a las 17:03:38
 -- Versión del servidor: 10.1.13-MariaDB
 -- Versión de PHP: 5.6.20
 
@@ -31,6 +31,16 @@ CREATE TABLE `area` (
   `NOMBRE` varchar(255) NOT NULL,
   `FKAREA` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `area`
+--
+
+INSERT INTO `area` (`IDAREA`, `NOMBRE`, `FKAREA`) VALUES
+(10, 'HOLA_123', 20),
+(20, 'HOLA', 10),
+(30, 'AREA_3', NULL),
+(40, 'AREA', 10);
 
 -- --------------------------------------------------------
 
@@ -131,6 +141,13 @@ CREATE TABLE `rol` (
   `NOMBRE` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Volcado de datos para la tabla `rol`
+--
+
+INSERT INTO `rol` (`IDROL`, `NOMBRE`) VALUES
+(1, 'ADMINISTRADOR');
+
 -- --------------------------------------------------------
 
 --
@@ -142,6 +159,13 @@ CREATE TABLE `usuario` (
   `NOMBRE` varchar(255) NOT NULL,
   `IDROL` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`IDUSUARIO`, `NOMBRE`, `IDROL`) VALUES
+(16108017, 'JUAN1927', 1);
 
 --
 -- Índices para tablas volcadas
