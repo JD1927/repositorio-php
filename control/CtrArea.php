@@ -108,7 +108,7 @@ class CtrArea
 		//--------------Se ejecuta Comando SQL-------------------------
 
 
-    $select = "DELETE from AREA where IDAREA =" . $cod . "";
+    $select = "DELETE FROM area where IDAREA =" . $cod . "";
     echo $select;
     $recordSet = $objConnection->executeSQL($bd, $select);
     $objConnection->close($enlace);

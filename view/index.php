@@ -73,11 +73,39 @@ try {
 
   <!-- Custom styles for this template -->
   <link href="../styles/sign-in.css" rel="stylesheet">
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      width: 100%;
+      padding: inherit;
+    }
+
+    .bg {
+        /* The image used */
+        background-image: url("sign-in.jpg");
+
+        /* Full height */
+        height: 100%; 
+        width: 100%;
+        /* Center and scale the image nicely */
+        background-position: auto;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    .title {
+      color: #F8F8F8;
+      background-color: #A29CAD;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 
 <body class="text-center">
-  <form class="form-signin" method="POST" action="index.php">
-    <h1 class="h3 mb-3 font-weight-normal">Iniciar sesión</h1>
+  <div class="bg">
+  <form class="form-signin" style="margin-top:10%" method="POST" action="index.php">
+    <h1 class="h3 mb-3 font-weight-normal title">¡Bienvenido!</h1>
     <div class="form-group">
       <div class="input-group">
         <div class="input-group-prepend">
@@ -94,8 +122,10 @@ try {
         <input type="text" class="form-control" id="pwd" name="password" placeholder="Contraseña" autocomplete="off">
       </div>
     </div>
-    <button class="btn btn-lg btn-success btn-block" name="sign-in" type="submit" value="sign-in">Ingresar</button>
+    <button class="btn btn-lg btn-success btn-block" style="border-radius: 25px;" name="sign-in" type="submit" value="sign-in">Ingresar</button>
   </form>
+</div>
+  
 </body>
 
 </html>

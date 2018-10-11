@@ -41,7 +41,7 @@ if ($_POST["read"] == "read") {
   try {
     //setting values
     $cod = $_POST["cod"];
-    $objArea = new AreaModel($cod, $name, $subarea);
+    $objArea = new AreaModel($cod, null, $null);
     $objCtrArea = new CtrArea($objArea);
 
 
@@ -94,15 +94,16 @@ if ($_POST["delete"] == "delete") {
 
     $cod = $_POST["cod"];
 
-    $objArea = new AreaModel($cod, $name, $subarea);
+    $objArea = new AreaModel($cod, null, null);
     $objCtrArea = new CtrArea($objArea);
 
     if (!$objCtrArea->delete()) {
-      echo "<center> <h1>SE HA BORRADO CON EXITO DE LA BASE DE DATOS</h1></center>";
+      echo "<div class='alert alert-success' role='alert'>
+              El área ".$cod." ha sido eliminado exitosamente!
+            </div>";
     } else {
       echo "<center> <h1>NO SE HA ENCONTRADO NADA CON ESTE AREA</h1></center>";
     }
-
     $mat = $objCtrArea->area_list();
     $length = count($mat);
 
@@ -127,6 +128,7 @@ if ($_POST["delete"] == "delete") {
     crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
     crossorigin="anonymous">
+  <link rel="stylesheet" href="../styles/utilities.css">
   <title>Repositorio - PHP</title>
 
   <!-- Custom styles for this template -->
@@ -190,7 +192,7 @@ if ($_POST["delete"] == "delete") {
                   <div class="col-md-6">
                     <div class="form-group">
                       <div class="row">
-
+                        <br><br>
                           <button type="submit" name="create" value="create" class="btn btn-success btn-block">
                             <span>
                               <i class="fas fa-user-plus"></i>
@@ -220,7 +222,7 @@ if ($_POST["delete"] == "delete") {
           <div class="container">
             <?php
 
-            echo "<div class=''>
+            echo "<div>
                   <table class='table table-hover table-response'>
                     <thead class='thead-dark'>
                       <tr>

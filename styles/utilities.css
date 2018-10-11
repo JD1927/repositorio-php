@@ -11,6 +11,11 @@
   min-height: 450px;
 }
 
+.scrollbary{
+  overflow-y: 50vh;
+  height: 50vh;
+}
+
 .scrollbar-primary::-webkit-scrollbar {
 width: 12px;
 background-color: #F5F5F5; }
