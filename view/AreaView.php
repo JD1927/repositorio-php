@@ -8,7 +8,7 @@ if (!$_SESSION["name"]) {
 include("../model/AreaModel.php");
 include("../control/CtrArea.php");
 include("../control/CtrConnection.php");
-
+ 
 //Listar áreas
 $objArea = new AreaModel(null, null, null);
 $objCtrArea = new CtrArea($objArea);
