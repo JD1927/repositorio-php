@@ -31,7 +31,7 @@ class CtrArea
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
       $this->recordSet = $recordSet;
-
+      return true;
     }
 
   }
@@ -76,14 +76,12 @@ class CtrArea
     $objConnection = new CtrConnection();
     $enlace = $objConnection->connect('localhost', $bd, 'root', '');
 
-
     //--------------Se ejecuta Comando SQL-------------------------
     if (is_null($subarea) || $subarea == '') {
       $select = "UPDATE `area` SET `NOMBRE` = '".$name."', `FKAREA` = NULL WHERE `area`.`IDAREA` = ".$cod."";
     }else{
       $select = "UPDATE area set NOMBRE='" . $name . "', FKAREA=" . $subarea . " where IDAREA =" . $cod . "";
     }
-    echo $select;
     $recordSet = $objConnection->executeSQL($bd, $select);
     
     $objConnection->close($enlace);
@@ -93,6 +91,7 @@ class CtrArea
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
       $this->recordSet = $recordSet;
+      return true;
     }
 
   }
@@ -107,10 +106,9 @@ class CtrArea
 
 		//--------------Se ejecuta Comando SQL-------------------------
 
-
     $select = "DELETE FROM area where IDAREA =" . $cod . "";
-    echo $select;
     $recordSet = $objConnection->executeSQL($bd, $select);
+    
     $objConnection->close($enlace);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {
@@ -118,22 +116,20 @@ class CtrArea
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
       $this->recordSet = $recordSet;
-
+      return true;
     }
 
   }
   function read()
   {
-    $cod = $this->objArea->getcodArea();
+    $cod = $this->objArea->getCodArea();
 
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $enlace = $objConnection->connect('localhost', $bd, 'root', '');
 
-    $select = "SELECT * from AREA where IDAREA =" . $cod . "";
-        // echo " Comando SQL : ". $select."<br>";
+    $select = "SELECT * FROM area WHERE IDAREA =" . $cod . "";
     $recordSet = $objConnection->executeSQL($bd, $select);
-
         // LA FUNCI�N  mysql_fetch_array   PERMITE RECORRER EL RECORDSET (CURSOR A LA TABLA)
         // AQU� SE ASIGNA EL CONTENIDO DEL PRIMER REGISTRO DEL RECORDSET A UNA VARIABLE IDENTIFICADA COMO:
 

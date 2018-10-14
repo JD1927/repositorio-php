@@ -36,8 +36,7 @@ try {
     $password === $IDUSUARIO ? $password = $IDUSUARIO : $password = null;
 
     //Valida si el usuario y la contraseñas son diferentes de nulo y vacío
-    if ((isset($name) && (!empty($name))) && 
-    ((!empty($password)) && (isset($password)))) {
+    if ((isset($name) && (!empty($name))) && ((!empty($password)) && (isset($password)))) {
 
       //Agrega al array de sesión el usuario y la contraseña
       $_SESSION["name"] = $name;
@@ -83,7 +82,7 @@ try {
 
     .bg {
         /* The image used */
-        background-image: url("sign-in.jpg");
+        background-image: url("../images/sign-in.jpg");
 
         /* Full height */
         height: 100%; 
@@ -124,8 +123,15 @@ try {
     </div>
     <button class="btn btn-lg btn-success btn-block" style="border-radius: 25px;" name="sign-in" type="submit" value="sign-in">Ingresar</button>
   </form>
+  <footer style="color:white;"><!--Estudiantes-->
+    &copy; Estudiantes<br> 
+    Ana María Jaramillo Valiente <br> 
+    Kevin Hernandez <br> 
+    Juan David Martínez Martínez <br>
+    Juan David Aguirre Córdoba
+  </footer>
 </div>
-  
+
 </body>
 
 </html>

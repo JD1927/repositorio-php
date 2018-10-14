@@ -1,6 +1,8 @@
 <?php
+//Inicia la sesión
 session_start();
-if (!$_SESSION["name"]) {
+//Valida que dentro de la sesión estén todos los valores requeridos para acceder a la página
+if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
   header('Location: index.php');
 }
 ?>
