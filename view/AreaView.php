@@ -35,12 +35,12 @@ if ($_POST["create"] == "create") {
 
     $objCtrArea->create();
     //Esta variable se usa para mostrar un mensaje de alerta
-    $message = "¡Se creó el área con código: " . $cod . " exitosamente!";
+    $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
     //Vacia los variables correspondientes al área
     $name = "";
     $subarea = "";
     $cod = "";
-    
+
     $mat = $objCtrArea->area_list();
     $length = count($mat);
   } catch (Exception $exp) {
@@ -65,9 +65,9 @@ if ($_POST["read"] == "read") {
 
     if ((!is_null($cod) && (!empty($cod)))) {
       //Esta variable se usa para mostrar un mensaje de alerta
-      $message = "¡Se consultó el área con código: " . $cod . " exitosamente!";
+      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
     } else {
-      $message = "¡No se encontró el área ingresada!";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
     }
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -86,13 +86,13 @@ if ($_POST["update"] == "update") {
     $objCtrArea = new CtrArea($objArea);
 
     if ($objCtrArea->update()) {
-      $message = "¡Se actualizó el área de código: " . $cod . " exitosamente!";
+      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
       //Vacia los variables correspondientes al área
       $name = "";
       $subarea = "";
       $cod = "";
     } else {
-      $message = "¡No se encontró el área ingresada!";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
     }
 
     $mat = $objCtrArea->area_list();
@@ -114,13 +114,13 @@ if ($_POST["delete"] == "delete") {
     $objCtrArea = new CtrArea($objArea);
 
     if ($objCtrArea->delete()) {
-      $message = "¡Se eliminó el área de código: " . $cod . " exitosamente!";
+      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
             //Vacia los variables correspondientes al área
       $name = "";
       $subarea = "";
       $cod = "";
     } else {
-      $message = "¡No se encontró el área ingresada!";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
     }
     $mat = $objCtrArea->area_list();
     $length = count($mat);
@@ -174,9 +174,15 @@ echo "<!DOCTYPE html>
               </a>
             </li>
             <li class='nav-item'>
-              <a class='nav-link' href='AreaView.php'>
+              <a class='nav-link active' href='AreaView.php'>
                 <span><i class='fas fa-square-root-alt'></i></span>
                 Áreas
+              </a>
+            </li>
+            <li class='nav-item'>
+              <a class='nav-link' href='MaterialView.php'>
+              <span><i class='fas fa-box'></i></span>
+                Material
               </a>
             </li>
           </ul>
@@ -192,16 +198,22 @@ echo "<!DOCTYPE html>
                 <div class='row'>
                   <div class='col-md-6'>
                   <div class='form'>
-                  <div class='form-group'>
-                    <label for='cod'>Código</label>
+                  <div class='input-group mb-3'>
+                    <div class='input-group-prepend'>
+                      <span class='input-group-text' id='cod'>Código</span>
+                    </div>
                     <input type='text' class='form-control' value='" . $cod . "' name='cod' placeholder='Código de área' autocomplete='off'>
                   </div>
-                  <div class='form-group'>
-                    <label for='name'>Nombre</label>
+                  <div class='input-group mb-3'>
+                    <div class='input-group-prepend'>
+                      <span class='input-group-text' id='name'>Nombre</span>
+                    </div>
                     <input type='text' class='form-control' value='" . $name . "' name='name' placeholder='Nombre del área' autocomplete='off'>
                   </div>
-                  <div class='form-group'>
-                    <label for='subarea'>Subárea</label>
+                  <div class='input-group mb-3'>
+                    <div class='input-group-prepend'>
+                      <span class='input-group-text' id='subarea'>Subárea</span>
+                    </div>
                     <input type='text' class='form-control' value='" . $subarea . "' name='subarea' placeholder='Subárea' autocomplete='off'>
                   </div>
                 </div>
@@ -235,37 +247,36 @@ echo "<!DOCTYPE html>
               </div>
             </div>
           </div>";
-            if (!is_null($message)) {
-              echo "<div class='alert alert-dark' role='alert'>
-                      ".$message."
-                    </div>";
-            }
-
-        echo "<div class='container'>  
-                <div>
-                  <table class='table table-hover table-response'>
-                    <thead class='thead-dark'>
-                      <tr>
-                          <th scope='col'>Código Área</th>
-                          <th scope='col'>Nombre</th>
-                          <th scope='col'>Subárea</th>
-                      </tr>
-                    </thead>
-                    <tbody>";
-                for ($i = 0; $i < $length; $i++) {
-                echo "<tr>
-                        <td scope='row'>" . $mat[$i][1] . "</td>
-                        <td scope='row'> " . $mat[$i][2] . "</td>
-                        <td scope='row'>" . (is_null($mat[$i][3]) ? 'No tiene' : $mat[$i][3]) . "</td>
-                      </tr>";
-                }     
-              echo "</tbody>  
-                </table>
-              </div>
-            </div>
-      </main>
-    </div>
-  </div>
+          if (!is_null($message)) {
+            echo "<div class='alert alert-dark' role='alert'>
+                                          " . $message . "
+                  </div>";
+          }
+            echo "<div class='container'>  
+                              <div>
+                                <table class='table table-hover table-response'>
+                                  <thead class='thead-dark'>
+                                    <tr>
+                                        <th scope='col'>Código Área</th>
+                                        <th scope='col'>Nombre</th>
+                                        <th scope='col'>Subárea</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>";
+            for ($i = 0; $i < $length; $i++) {
+                              echo "<tr>
+                                      <td scope='row'>" . $mat[$i][1] . "</td>
+                                      <td scope='row'> " . $mat[$i][2] . "</td>
+                                      <td scope='row'>" . (is_null($mat[$i][3]) ? 'No tiene' : $mat[$i][3]) . "</td>
+                                    </tr>";
+}
+                            echo "</tbody>  
+                                </table>
+                              </div>
+                            </div>
+                        </main>
+                      </div>
+                  </div>
 
   <script src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo'
     crossorigin='anonymous'></script>

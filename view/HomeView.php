@@ -42,7 +42,7 @@ if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="HomeView.php">
+              <a class="nav-link active" href="HomeView.php">
                 <span><i class="fas fa-home"></i></span>
                 Inicio
               </a>
@@ -51,6 +51,12 @@ if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
               <a class="nav-link" href="AreaView.php">
                 <span><i class="fas fa-square-root-alt"></i></span>
                 Áreas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="MaterialView.php">
+                <span><i class='fas fa-box'></i></span>
+                Material
               </a>
             </li>
           </ul>

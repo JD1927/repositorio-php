@@ -1,20 +1,29 @@
 <?
-class CtrArea
+class CtrMaterial
 {
+  var $objMaterial;
   var $objArea;
   var $recordSet;
-  function CtrArea($objArea)
+  function CtrMaterial($objMaterial,$objArea)
   {
-    //Obtiene el objeto de ÁreaModel
+    //Obtiene el objeto de MaterialModel
+    $this->objMaterial = $objMaterial;
+    //Obtiene el objeto de AreaModel
     $this->objArea = $objArea;
-
   }
 
   function create()
   {
     //Obtiene los valores ingresados en la vista
-    $cod = $this->objArea->getCodArea();
-    $name = $this->objArea->getName();
+    //material
+    $cod_material = $this->objMaterial->getCodMaterial();
+    $title = $this->objMaterial->getTitle();
+    $description = $this->objMaterial->getDescription();
+    $image = $this->objMaterial->getImage();
+    //relacionmaterialautor -->$cod_material
+    $cod_author = $this->objMaterial->getAuthor();
+    //relacionareamaterial -->$cod_material
+    $cod_area = $this->objMaterial->getCodArea();  
 
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
@@ -23,8 +32,10 @@ class CtrArea
 
 		//--------------Se ejecuta Comando SQL-------------------------
 
-    $select = "INSERT into area (IDAREA,NOMBRE) values (" . $cod . ",'" . $name . "')";
-    $recordSet = $objConnection->executeSQL($bd, $select);
+    $sentenceMaterial = "INSERT into material (TITULO,DESCRIPCION,IMAGEN) values ('" . $title . "','".$description."','.$image.')";
+    $sentenceRelationMA = "INSERT into relacionmaterialautor (IDMATERIAL, IDAUTOR) values (".$cod_material.",".$cod_author.")";
+
+    $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {
@@ -48,10 +59,10 @@ class CtrArea
     
             //--------------Se ejecuta Comando SQL-------------------------
 
-    $select = "SELECT * FROM area";
-            //  echo " Comando SQL : ". $select;
+    $sentence = "SELECT * FROM area";
+            //  echo " Comando SQL : ". $sentence;
     //Obtiene los registros de la consulta
-    $recordSet = $objConnection->executeSQL($bd, $select);
+    $recordSet = $objConnection->executeSQL($bd, $sentence);
     //Inicializa el contador
     $i = 0;
     //Inicializa las dimensiones del array bidimiensional de áreas
@@ -73,9 +84,9 @@ class CtrArea
   function update()
   {
     //Obtiene los campos ingresados en la vista
-    $cod = $this->objArea->getCodArea();
-    $name = $this->objArea->getName();
-    $subarea = $this->objArea->getSubarea();
+    $cod_material = $this->objMaterial->getCodArea();
+    $title = $this->objMaterial->getName();
+    $subarea = $this->objMaterial->getSubarea();
 
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
@@ -84,12 +95,12 @@ class CtrArea
 
     //Valida si el campo de subárea está nulo o vacío para ejecutar una sentencia
     if (is_null($subarea) || $subarea == '') {
-      $select = "UPDATE `area` SET `NOMBRE` = '".$name."', `FKAREA` = NULL WHERE `area`.`IDAREA` = ".$cod."";
+      $sentence = "UPDATE `area` SET `NOMBRE` = '".$title."', `FKAREA` = NULL WHERE `area`.`IDAREA` = ".$cod_material."";
     }else{
-      $select = "UPDATE area set NOMBRE='" . $name . "', FKAREA=" . $subarea . " where IDAREA =" . $cod . "";
+      $sentence = "UPDATE area set NOMBRE='" . $title . "', FKAREA=" . $subarea . " where IDAREA =" . $cod_material . "";
     }
     //Obtiene si el resultado de la operación fue exitoso
-    $recordSet = $objConnection->executeSQL($bd, $select);
+    $recordSet = $objConnection->executeSQL($bd, $sentence);
     //Cierra la conexión con la BD
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -104,7 +115,7 @@ class CtrArea
   }
   function delete()
   {
-    $cod = $this->objArea->getCodArea();
+    $cod_material = $this->objMaterial->getCodArea();
 
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
@@ -113,8 +124,8 @@ class CtrArea
 
 		//--------------Se ejecuta Comando SQL-------------------------
 
-    $select = "DELETE FROM area where IDAREA =" . $cod . "";
-    $recordSet = $objConnection->executeSQL($bd, $select);
+    $sentence = "DELETE FROM area where IDAREA =" . $cod_material . "";
+    $recordSet = $objConnection->executeSQL($bd, $sentence);
     
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -129,22 +140,22 @@ class CtrArea
   }
   function read()
   {
-    $cod = $this->objArea->getCodArea();
+    $cod_material = $this->objMaterial->getCodArea();
 
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-    $select = "SELECT * FROM area WHERE IDAREA =" . $cod . "";
-    $recordSet = $objConnection->executeSQL($bd, $select);
+    $sentence = "SELECT * FROM area WHERE IDAREA =" . $cod_material . "";
+    $recordSet = $objConnection->executeSQL($bd, $sentence);
         // LA FUNCI�N  mysql_fetch_array   PERMITE RECORRER EL RECORDSET (CURSOR A LA TABLA)
         // AQU� SE ASIGNA EL CONTENIDO DEL PRIMER REGISTRO DEL RECORDSET A UNA VARIABLE IDENTIFICADA COMO:
 
     $search = mysql_fetch_array($recordSet);
 
-    $this->objArea->setCodArea($search['IDAREA']);
-    $this->objArea->setName($search['NOMBRE']);
-    $this->objArea->setSubarea($search['FKAREA']);
+    $this->objMaterial->setCodArea($search['IDAREA']);
+    $this->objMaterial->setName($search['NOMBRE']);
+    $this->objMaterial->setSubarea($search['FKAREA']);
 
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -152,7 +163,7 @@ class CtrArea
       die(" ERROR CON EL COMANDO SQL: " . mysql_error()) . "<br>";
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
-      return $this->objArea;
+      return $this->objMaterial;
 
     }
 
