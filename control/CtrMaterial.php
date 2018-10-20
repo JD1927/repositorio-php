@@ -21,24 +21,35 @@ class CtrMaterial
     $description = $this->objMaterial->getDescription();
     $image = $this->objMaterial->getImage();
     //relacionmaterialautor -->$cod_material
-    $cod_author = $this->objMaterial->getAuthor();
+    $cod_author = 1036685232; //$this->objMaterial->getAuthor();
     //relacionareamaterial -->$cod_material
-    $cod_area = $this->objMaterial->getCodArea();  
+    $cod_area = 10;//$this->objMaterial->getCodArea();
 
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-		//--------------Se ejecuta Comando SQL-------------------------
-
+    //--------------Se ejecuta Comando SQL-------------------------
+    //Crea un nuevo material
     $sentenceMaterial = "INSERT into material (TITULO,DESCRIPCION,IMAGEN) values ('" . $title . "','".$description."','.$image.')";
-    $sentenceRelationMA = "INSERT into relacionmaterialautor (IDMATERIAL, IDAUTOR) values (".$cod_material.",".$cod_author.")";
-
     $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
+
+    //Consultar ID del Material
+    $sentenceSelectIdMaterial = "SELECT IDMATERIAL FROM MATERIAL WHERE TITULO = '".$title."'";
+    $cod_material = $objConnection->executeSQL($bd, $sentenceSelectIdMaterial);
+
+    //Relaciona Material con Autor
+    $sentenceRelationMA = "INSERT into relacionmaterialautor (IDMATERIAL, IDAUTOR) values (".$cod_material.",".$cod_author.")";
+    $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
+    
+    //Relacion Area con Material
+    $sentenceRelationAM = "INSERT into relacionareamaterial (IDMATERIAL, IDAREA) values (".$cod_material.",".$cod_area.")";
+    $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
+
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
-    if (!$recordSet) {
+    if (!$recordSet || !$recordSet2 || !$recordSet3 || !$cod_material) {
       die(" ERROR CON EL COMANDO SQL: " . mysql_error());
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------

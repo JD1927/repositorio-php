@@ -31,18 +31,17 @@ $length_areas = count($areas);
   //create
 if ($_POST["create"] == "create") {
 
-  if ($_FILES['image']['type'] != "image/jpeg" ||
-    $_FILES['image']['type'] != "image/png") {
+  if ($_FILES['image']['type'] == "image/jpeg" ||
+    $_FILES['image']['type'] == "image/png") {
     try {
       
       //Carpeta de destino
       //Archivo
       $image = $target_dir . basename($_FILES['image']['name']);
-
+      $image_msm = $_FILES['image']['tmp_name'];
       if (!file_exists($image)) {
         if (move_uploaded_file($_FILES['image']['tmp_name'], $image)) {
-
-          $image = $_FILES['image']['name'];
+          $image_msm = $_FILES['image']['tmp_name'];
           $title = $_POST["title"];
           $description = $_POST["description"];
           $cod_material = $_POST["cod_material"];
@@ -52,10 +51,10 @@ if ($_POST["create"] == "create") {
     
           $objArea = new AreaModel($cod_area, null, null);
           $objMaterial = new MaterialModel(null, $title, $description, $image);
-          
-          
+          //$objAuthor = new AuthorModel()
+          $objCtrMaterial = new CtrMaterial($objMaterial,$objArea);
 
-          $objCtrArea->create();
+          $objCtrMaterial->create();
           //Esta variable se usa para mostrar un mensaje de alerta
           $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
           //Vacia los variables correspondientes al área
@@ -63,13 +62,13 @@ if ($_POST["create"] == "create") {
           $subarea = "";
           $cod = "";
     
-          $areas = $objCtrArea->area_list();
-          $length_areas = count($areas);
+          /* $areas = $objCtrArea->area_list();
+          $length_areas = count($areas); */
           }else{
-            $image_msm = "¡El ".$_FILES['image']['name']." no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+            $image_msm = "¡El ".$_FILES['image']['name']." no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
           }
       }else{
-        $image_msm = "¡El archivo ya existe! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+        $image_msm = "¡El archivo ya existe! <span><i class='fas fa-frown'></i></span>";
       }
       
 
@@ -77,7 +76,7 @@ if ($_POST["create"] == "create") {
       echo "ERROR ....R " . $exp->getMessage() . "\n";
     }
   } else {
-    $image_msm = "¡El archivo no se pudo subir satisfactoriamente! " . $_FILES['image']['type'] . " <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+    $image_msm = "¡El archivo no se pudo subir satisfactoriamente! El tipo de datos es:" . $_FILES['image']['type'] . " <span><i class='fas fa-frown'></i></span>";
   }
 }
   //select
@@ -99,7 +98,7 @@ if ($_POST["read"] == "read") {
       //Esta variable se usa para mostrar un mensaje de alerta
       $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
     }
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -124,7 +123,7 @@ if ($_POST["update"] == "update") {
       $subarea = "";
       $cod = "";
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
     }
 
     $areas = $objCtrArea->area_list();
@@ -152,7 +151,7 @@ if ($_POST["delete"] == "delete") {
       $subarea = "";
       $cod = "";
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
     }
     $areas = $objCtrArea->area_list();
     $length_areas = count($areas);
@@ -215,12 +214,6 @@ echo "<!DOCTYPE html>
               <a class='nav-link active' href='MaterialView.php'>
                 <span><i class='fas fa-box'></i></span>
                 Material
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link active'>
-                <span><i class='fas fa-box'></i></span>
-                ".$image_msm."
               </a>
             </li>
           </ul>
@@ -299,6 +292,11 @@ echo "<!DOCTYPE html>
               if (!is_null($message)) {
                 echo "<div class='alert alert-dark' role='alert'>
                                                         " . $message . "
+                      </div>";
+              }
+              if (!is_null($image_msm)) {
+                echo "<div class='alert alert-dark' role='alert'>
+                                                        " . $image_msm . "
                       </div>";
               }
                   echo "<div class='container'>  
