@@ -4,7 +4,7 @@ class CtrMaterial
   var $objMaterial;
   var $objArea;
   var $recordSet;
-  function CtrMaterial($objMaterial,$objArea)
+  function CtrMaterial($objMaterial, $objArea)
   {
     //Obtiene el objeto de MaterialModel
     $this->objMaterial = $objMaterial;
@@ -16,15 +16,14 @@ class CtrMaterial
   {
     //Obtiene los valores ingresados en la vista
     //material
-    $cod_material = $this->objMaterial->getCodMaterial();
     $title = $this->objMaterial->getTitle();
     $description = $this->objMaterial->getDescription();
     $image = $this->objMaterial->getImage();
+    
     //relacionmaterialautor -->$cod_material
     $cod_author = 1036685232; //$this->objMaterial->getAuthor();
     //relacionareamaterial -->$cod_material
-    $cod_area = 10;//$this->objMaterial->getCodArea();
-
+    $cod_area = $this->objArea->getCodArea();
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
@@ -32,24 +31,26 @@ class CtrMaterial
 
     //--------------Se ejecuta Comando SQL-------------------------
     //Crea un nuevo material
-    $sentenceMaterial = "INSERT into material (TITULO,DESCRIPCION,IMAGEN) values ('" . $title . "','".$description."','.$image.')";
+    $sentenceMaterial = "INSERT into material (TITULO,DESCRIPCION,IMAGEN) values ('" . $title . "','" . $description . "','" . $image . "')";
     $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
 
     //Consultar ID del Material
-    $sentenceSelectIdMaterial = "SELECT IDMATERIAL FROM MATERIAL WHERE TITULO = '".$title."'";
-    $cod_material = $objConnection->executeSQL($bd, $sentenceSelectIdMaterial);
+    $sentenceSelectIdMaterial = "SELECT IDMATERIAL FROM material WHERE TITULO = '".$title."'";
+    $recordSet4 = $objConnection->executeSQL($bd, $sentenceSelectIdMaterial);
+    $select_material = mysql_fetch_array($recordSet4);
+    $cod_material = $select_material['IDMATERIAL'];
 
     //Relaciona Material con Autor
-    $sentenceRelationMA = "INSERT into relacionmaterialautor (IDMATERIAL, IDAUTOR) values (".$cod_material.",".$cod_author.")";
+    $sentenceRelationMA = "INSERT into relacionmaterialautor (IDMATERIAL, IDAUTOR) values (" . $cod_material . "," . $cod_author . ")";
     $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
     
     //Relacion Area con Material
-    $sentenceRelationAM = "INSERT into relacionareamaterial (IDMATERIAL, IDAREA) values (".$cod_material.",".$cod_area.")";
+    $sentenceRelationAM = "INSERT into relacionareamaterial (IDMATERIAL, IDAREA) values (" . $cod_material . "," . $cod_area . ")";
     $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
 
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
-    if (!$recordSet || !$recordSet2 || !$recordSet3 || !$cod_material) {
+    if (!$cod_material) {
       die(" ERROR CON EL COMANDO SQL: " . mysql_error());
     } else {
 			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
@@ -59,7 +60,7 @@ class CtrMaterial
 
   }
 
-  function area_list()
+  function material_list()
   {
     
             //---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
@@ -70,19 +71,32 @@ class CtrMaterial
     
             //--------------Se ejecuta Comando SQL-------------------------
 
-    $sentence = "SELECT * FROM area";
+    $sentence = "SELECT m.IDMATERIAL, m.TITULO, m.DESCRIPCION, m.IMAGEN,au.IDAUTOR, au.NOMBRE AS AUTHOR,ar.IDAREA, ar.NOMBRE AS AREA 
+     FROM material m INNER JOIN relacionmaterialautor rma 
+     ON m.IDMATERIAL = rma.IDMATERIAL 
+     INNER JOIN autor au 
+     ON rma.IDAUTOR = au.IDAUTOR 
+     INNER JOIN relacionareamaterial ram 
+     ON m.IDMATERIAL = ram.IDMATERIAL 
+     INNER JOIN area ar 
+     ON ram.IDAREA = ar.IDAREA ";
             //  echo " Comando SQL : ". $sentence;
     //Obtiene los registros de la consulta
     $recordSet = $objConnection->executeSQL($bd, $sentence);
     //Inicializa el contador
     $i = 0;
     //Inicializa las dimensiones del array bidimiensional de áreas
-    $mat[0][0] = 3;
+    $mat[0][0] = 8;
     //Recorre el array y incrementa el valor de contador
-    while ($search= mysql_fetch_array($recordSet)) {
-      $mat[$i][1] = $search['IDAREA'];
-      $mat[$i][2] = $search['NOMBRE'];
-      $mat[$i][3] = $search['FKAREA'];
+    while ($search = mysql_fetch_array($recordSet)) {
+      $mat[$i][1] = $search['IDMATERIAL'];
+      $mat[$i][2] = $search['TITULO'];
+      $mat[$i][3] = $search['DESCRIPCION'];
+      $mat[$i][4] = $search['IMAGEN'];
+      $mat[$i][5] = $search['IDAUTOR'];
+      $mat[$i][6] = $search['AUTHOR'];
+      $mat[$i][7] = $search['IDAREA'];
+      $mat[$i][8] = $search['AREA'];
       $i = $i + 1;
     }
     //Cierra la conexión con la BD
@@ -95,23 +109,44 @@ class CtrMaterial
   function update()
   {
     //Obtiene los campos ingresados en la vista
-    $cod_material = $this->objMaterial->getCodArea();
-    $title = $this->objMaterial->getName();
-    $subarea = $this->objMaterial->getSubarea();
-
+    //Material
+    $cod_material = $this->objMaterial->getCodMaterial();
+    $title = $this->objMaterial->getTitle();
+    $description = $this->objMaterial->getDescription();
+    $image = $this->objMaterial->getImage();
+    //Area
+    $cod_area = $this->objArea->getCodArea();
+    //Author
+    $cod_author = 1036685232;
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-    //Valida si el campo de subárea está nulo o vacío para ejecutar una sentencia
-    if (is_null($subarea) || $subarea == '') {
-      $sentence = "UPDATE `area` SET `NOMBRE` = '".$title."', `FKAREA` = NULL WHERE `area`.`IDAREA` = ".$cod_material."";
-    }else{
-      $sentence = "UPDATE area set NOMBRE='" . $title . "', FKAREA=" . $subarea . " where IDAREA =" . $cod_material . "";
+    //Consultar imagen del material
+    $sentenceImage = "SELECT IMAGEN FROM material WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet4 = $objConnection->executeSQL($bd, $sentenceImage);
+    $select_material = mysql_fetch_array($recordSet4);
+    $old_image = $select_material['IMAGEN'];
+
+    if ($old_image != $image) {
+      //Borrando archivo
+      if (!unlink('../material_images/' . $old_image)) {
+        die("Se presentó un error borrando el archivo" . $old_image);
+      }
     }
-    //Obtiene si el resultado de la operación fue exitoso
-    $recordSet = $objConnection->executeSQL($bd, $sentence);
+        
+    //Actualiza el material
+    $sentenceMaterial = "UPDATE material SET TITULO='" . $title . "',DESCRIPCION='" . $description . "',IMAGEN='" . $image . "' WHERE IDMATERIAL = " . $cod_material . "";
+    $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
+
+    //Relaciona Material con Autor
+    $sentenceRelationMA = "UPDATE relacionmaterialautor SET IDAUTOR=" . $cod_author . " WHERE IDMATERIAL = " . $cod_material . "";
+    $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
+    
+    //Relacion Area con Material
+    $sentenceRelationAM = "UPDATE relacionareamaterial SET IDAREA=" . $cod_area . " WHERE IDMATERIAL=" . $cod_material . "";
+    $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
     //Cierra la conexión con la BD
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -124,26 +159,49 @@ class CtrMaterial
     }
 
   }
+
   function delete()
   {
-    $cod_material = $this->objMaterial->getCodArea();
-
+    //Obtiene los valores ingresados en la vista
+    //material
+    $cod_material = $this->objMaterial->getCodMaterial();
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-		//--------------Se ejecuta Comando SQL-------------------------
+    //--------------Se ejecuta Comando SQL-------------------------
+    //Consultar imagen del material
+    $sentenceImage = "SELECT IMAGEN FROM material WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet4 = $objConnection->executeSQL($bd, $sentenceImage);
+    $select_material = mysql_fetch_array($recordSet4);
+    $image = $select_material['IMAGEN'];
 
-    $sentence = "DELETE FROM area where IDAREA =" . $cod_material . "";
-    $recordSet = $objConnection->executeSQL($bd, $sentence);
+    //Elimina la relacion Material con Autor
+    $sentenceRelationMA = "DELETE FROM relacionmaterialautor WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
     
+    //Elimina la relacion Area con Material
+    $sentenceRelationAM = "DELETE FROM relacionareamaterial WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
+
+    //Elimina el material
+    $sentenceMaterial = "DELETE FROM material WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
+    //Cierra la conexión
     $objConnection->close($link);
+
+    //Borrando archivo
+    if (!unlink('../material_images/' . $image)) {
+      die("Se presentó un error borrando el archivo" . $image);
+    }
+
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
-    if (!$recordSet) {
+    if (!$cod_material) {
       die(" ERROR CON EL COMANDO SQL: " . mysql_error());
-    } else {
-			//----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
+    } else {  
+      //----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
+
       $this->recordSet = $recordSet;
       return true;
     }
@@ -151,23 +209,34 @@ class CtrMaterial
   }
   function read()
   {
-    $cod_material = $this->objMaterial->getCodArea();
+    $cod_material = $this->objMaterial->getCodMaterial();
 
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-    $sentence = "SELECT * FROM area WHERE IDAREA =" . $cod_material . "";
+    $sentence = "SELECT m.IDMATERIAL, m.TITULO, m.DESCRIPCION, m.IMAGEN,au.IDAUTOR, au.NOMBRE AS AUTHOR,ar.IDAREA, ar.NOMBRE AS AREA 
+     FROM material m INNER JOIN relacionmaterialautor rma 
+     ON m.IDMATERIAL = rma.IDMATERIAL 
+     INNER JOIN autor au 
+     ON rma.IDAUTOR = au.IDAUTOR 
+     INNER JOIN relacionareamaterial ram 
+     ON m.IDMATERIAL = ram.IDMATERIAL 
+     INNER JOIN area ar 
+     ON ram.IDAREA = ar.IDAREA  
+     WHERE m.IDMATERIAL = " . $cod_material . "";
     $recordSet = $objConnection->executeSQL($bd, $sentence);
         // LA FUNCI�N  mysql_fetch_array   PERMITE RECORRER EL RECORDSET (CURSOR A LA TABLA)
         // AQU� SE ASIGNA EL CONTENIDO DEL PRIMER REGISTRO DEL RECORDSET A UNA VARIABLE IDENTIFICADA COMO:
 
     $search = mysql_fetch_array($recordSet);
 
-    $this->objMaterial->setCodArea($search['IDAREA']);
-    $this->objMaterial->setName($search['NOMBRE']);
-    $this->objMaterial->setSubarea($search['FKAREA']);
-
+    $this->objMaterial->setCodMaterial($search['IDMATERIAL']);
+    $this->objMaterial->setTitle($search['TITULO']);
+    $this->objMaterial->setDescription($search['DESCRIPCION']);
+    $this->objMaterial->setImage($search['IMAGEN']);
+    $this->objArea->setCodArea($search['IDAREA']);
+    $this->objArea->setName($search['AREA']);
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {

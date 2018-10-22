@@ -7,26 +7,59 @@ if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
   header('Location: index.php');
 }
 //Incluye código 
-include("../model/AreaModel.php");
+//include("../model/AreaModel.php");
 include("../control/CtrArea.php");
 include("../control/CtrConnection.php");
-
+include("../control/CtrMaterial.php");
+include("../model/MaterialModel.php");
+include("../model/AreaModel.php");
 //Variables
 $image = "";
 $title = "";
 $description = "";
 $cod_material = "";
-$cod_author = "Seleccione un autor";
-$cod_area = "Seleccione un área";
+
+$cod_author = "Seleccione un autor...";
+
+$cod_area = "area";
+$area = "Seleccione un área...";
 $message = null;
 $image_msm = null;
 $target_dir = "../material_images/";
+
+//Acciones 
 
 //Listar áreas
 $objArea = new AreaModel(null, null, null);
 $objCtrArea = new CtrArea($objArea);
 $areas = $objCtrArea->area_list();
 $length_areas = count($areas);
+//Listar materiales
+$objMaterial = new MaterialModel(null, null, null, null);
+$objCtrMaterial = new CtrMaterial($objMaterial,$objArea);
+$materials = $objCtrMaterial->material_list();
+$length_materials = count($materials);
+
+//Material tools
+$materialTools = true;
+if ($_REQUEST["materialActions"] == "materialActions") {
+  if ($materialTools) {
+    $materialTools = false;
+
+    $objMaterial = new MaterialModel(null, null, null, null);
+    $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
+    $materials = $objCtrMaterial->material_list();
+    $length_materials = count($materials);
+  } else {
+    $materialTools = true;
+
+    $objArea = new AreaModel(null, null, null);
+    $objCtrArea = new CtrArea($objArea);
+    $areas = $objCtrArea->area_list();
+    $length_areas = count($areas);
+  }
+}
+
 
   //create
 if ($_POST["create"] == "create") {
@@ -38,19 +71,16 @@ if ($_POST["create"] == "create") {
       //Carpeta de destino
       //Archivo
       $image = $target_dir . basename($_FILES['image']['name']);
-      $image_msm = $_FILES['image']['tmp_name'];
+      $filename = $_FILES['image']['name'];
       if (!file_exists($image)) {
         if (move_uploaded_file($_FILES['image']['tmp_name'], $image)) {
-          $image_msm = $_FILES['image']['tmp_name'];
           $title = $_POST["title"];
           $description = $_POST["description"];
-          $cod_material = $_POST["cod_material"];
-    
-          $cod_author = $_POST["cod_author"];
+          //$cod_author = $_POST["cod_author"];
           $cod_area = $_POST["cod_area"];
     
           $objArea = new AreaModel($cod_area, null, null);
-          $objMaterial = new MaterialModel(null, $title, $description, $image);
+          $objMaterial = new MaterialModel(null, $title, $description, $filename);
           //$objAuthor = new AuthorModel()
           $objCtrMaterial = new CtrMaterial($objMaterial,$objArea);
 
@@ -58,19 +88,17 @@ if ($_POST["create"] == "create") {
           //Esta variable se usa para mostrar un mensaje de alerta
           $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
           //Vacia los variables correspondientes al área
-          $name = "";
-          $subarea = "";
-          $cod = "";
+          
     
           /* $areas = $objCtrArea->area_list();
           $length_areas = count($areas); */
-          }else{
-            $image_msm = "¡El ".$_FILES['image']['name']." no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
-          }
-      }else{
+        } else {
+          $image_msm = "¡El " . $_FILES['image']['name'] . " no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
+        }
+      } else {
         $image_msm = "¡El archivo ya existe! <span><i class='fas fa-frown'></i></span>";
       }
-      
+
 
     } catch (Exception $exp) {
       echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -84,17 +112,22 @@ if ($_POST["read"] == "read") {
 
   try {
     //setting values
-    $cod = $_POST["cod"];
-    $objArea = new AreaModel($cod, null, null);
-    $objCtrArea = new CtrArea($objArea);
+    $cod_material = $_POST['cod_material'];
+    $objArea = new AreaModel(null,null,null);
+    $objMaterial = new MaterialModel($cod_material, null, null,null);
+    $objCtrMaterial = new CtrMaterial($objMaterial,$objArea);
+    //Se consulta en la base de datos el material $cod_material
+    $objCtrMaterial->read();
+    //Se obtienen los valores consultados del material
+    $cod_material = $objMaterial->getCodMaterial();
+    $image = $objMaterial->getImage();
+    $title = $objMaterial->getTitle();
+    $description = $objMaterial->getDescription();
+    //Se obtienen los valores consultados del área
+    $cod_area = $objArea->getCodArea();
+    $area = $objArea->getName();
 
-    $objCtrArea->read();
-
-    $cod = $objArea->getcodArea();
-    $name = $objArea->getName();
-    $subarea = $objArea->getSubarea();
-
-    if ((!is_null($cod) && (!empty($cod)))) {
+    if ((!is_null($cod_material) && (!empty($cod_material)))) {
       //Esta variable se usa para mostrar un mensaje de alerta
       $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
     } else {
@@ -107,30 +140,64 @@ if ($_POST["read"] == "read") {
 }
   //update
 if ($_POST["update"] == "update") {
-  try {
-    //setting values
-    $name = $_POST["name"];
-    $subarea = $_POST["subarea"];
-    $cod = $_POST["cod"];
+  if ($_FILES['image']['type'] == "image/jpeg" ||
+    $_FILES['image']['type'] == "image/png") {
+    try {
+      
+      //Carpeta de destino
+      //Archivo
+      $image = $target_dir . basename($_FILES['image']['name']);
+      $filename = $_FILES['image']['name'];
+      if (!file_exists($image)) {
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $image)) {
+          $cod_material = $_POST['cod_material'];
+          $title = $_POST["title"];
+          $description = $_POST["description"];
+          //$cod_author = $_POST["cod_author"];
+          $cod_area = $_POST["cod_area"];
 
-    $objArea = new AreaModel($cod, $name, $subarea);
-    $objCtrArea = new CtrArea($objArea);
+          $objArea = new AreaModel($cod_area, null, null);
+          $objMaterial = new MaterialModel($cod_material, $title, $description, $filename);
+          //$objAuthor = new AuthorModel()
+          $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
+          if ($objCtrMaterial->update()) {
+            
+            //Se obtienen los valores consultados del material
+            $cod_material = $objMaterial->getCodMaterial();
+            $image = $objMaterial->getImage();
+            $title = $objMaterial->getTitle();
+            $description = $objMaterial->getDescription();
+            //Se obtienen los valores consultados del área
+            $cod_area = $objArea->getCodArea();
+            $area = $objArea->getName();
+            $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+          } else {
+            $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
+          }
+          $objCtrMaterial->read();
+    //Se obtienen los valores consultados del material
+          $cod_material = $objMaterial->getCodMaterial();
+          $image = $objMaterial->getImage();
+          $title = $objMaterial->getTitle();
+          $description = $objMaterial->getDescription();
+    //Se obtienen los valores consultados del área
+          $cod_area = $objArea->getCodArea();
+          $area = $objArea->getName();
 
-    if ($objCtrArea->update()) {
-      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
-      //Vacia los variables correspondientes al área
-      $name = "";
-      $subarea = "";
-      $cod = "";
-    } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
+
+        } else {
+          $image_msm = "¡El " . $_FILES['image']['name'] . " no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
+        }
+      } else {
+        $image_msm = "¡El archivo ya existe! <span><i class='fas fa-frown'></i></span>";
+      }
+
+
+    } catch (Exception $exp) {
+      echo "ERROR ....R " . $exp->getMessage() . "\n";
     }
-
-    $areas = $objCtrArea->area_list();
-    $length_areas = count($areas);
-
-  } catch (Exception $exp) {
-    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  } else {
+    $image_msm = "¡El archivo no se pudo subir satisfactoriamente! El tipo de datos es:" . $_FILES['image']['type'] . " <span><i class='fas fa-frown'></i></span>";
   }
 
 }
@@ -139,22 +206,19 @@ if ($_POST["delete"] == "delete") {
 
   try {
 
-    $cod = $_POST["cod"];
+    $cod_material = $_POST["cod_material"];
+    $cod_area = $_POST["cod_area"];
 
-    $objArea = new AreaModel($cod, null, null);
-    $objCtrArea = new CtrArea($objArea);
+    $objArea = new AreaModel($cod_area, null, null);
+    $objMaterial = new MaterialModel($cod_material, null, null, null);
+          //$objAuthor = new AuthorModel()
+    $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
 
-    if ($objCtrArea->delete()) {
+    if ($objCtrMaterial->delete()) {
       $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
-            //Vacia los variables correspondientes al área
-      $name = "";
-      $subarea = "";
-      $cod = "";
     } else {
       $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
     }
-    $areas = $objCtrArea->area_list();
-    $length_areas = count($areas);
 
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -220,10 +284,18 @@ echo "<!DOCTYPE html>
         </div>
       </nav>
 
-      <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>
-        <div class='container'>
+      <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>";
+      if($materialTools){
+        echo "<div class='container'>
           <div class='card'>
-          <div class='card-header' style='text-align: center;'><h4>Material</h4></div>
+          <div class='card-header' style='text-align: center;'>
+          <h4>Material</h4>
+          <form name='materialForm' method='GET' title='Ver tabla de materiales' action='MaterialView.php'>
+              <button type='submit' class='btn btn-dark' value='materialActions' name='materialActions'>
+                <span><i class='far fa-eye'></i><span>
+              </button>
+          </form>
+          </div>
             <div class='card-body'>
               <form name='materialForm' method='POST' action='MaterialView.php' enctype='multipart/form-data'>
                 <div class='form'>
@@ -239,25 +311,28 @@ echo "<!DOCTYPE html>
                   </div>
                   <div class='form-group'>
                     <label for='description'>Descripción</label>
-                    <textarea class='form-control' value='" . $description . "' name='description' id='description' rows='1'></textarea>
+                    <textarea class='form-control' name='description' id='description' rows='1'>".$description."</textarea>
                   </div>
                   <div class='form-group'>
                     <label for='image'>Imagen del material</label>
-                    <input type='file' class='form-control-file' style='border: 2px solid #26292D; border-radius: 25px;' value='" . $image . "' name='image' id='image'>
-                  </div>
+                    <input type='file' class='form-control-file' value='" . $image . "' name='image' id='image'>";
+                    if($_POST['read'] == 'read'){
+                      echo "<span><summary>Las imágenes se pueden ver oprimiendo el botón: <i class='far fa-eye'></i></summary><span>";
+                    }
+                  echo "</div>
                   <div class='form-row'>
                     <div class='form-group col-md-6'>
                       <label for='cod_area'>Área</label>
                       <select id='cod_area' name='cod_area' class='form-control'>
-                        <option selected>".$cod_area."</option>";
+                        <option selected='".$cod_area."'>".$area."</option>";
                         for ($i = 0; $i < $length_areas; $i++) {
-                  echo "<option value'".$areas[$i][1]."'>".$areas[$i][1]." - ".$areas[$i][2]."</option>";
+                  echo "<option value='".$areas[$i][1]."'>".$areas[$i][2]."</option>";
                         }
                 echo "</select>
                     </div>
                     <div class='form-group col-md-6'>
-                      <label for='cod_area'>Autor</label>
-                      <select id='cod_area' name='cod_area' class='form-control'>
+                      <label for='cod_author'>Autor</label>
+                      <select id='cod_author' name='cod_author' class='form-control'>
                         <option selected>".$cod_author."</option>
                         <option value='1036685232'>JUAN DAVID AGUIRRE CÓRDOBA</option>
                         <option value='1036685233'>DAVID CÓRDOBA</option>
@@ -299,32 +374,54 @@ echo "<!DOCTYPE html>
                                                         " . $image_msm . "
                       </div>";
               }
+      }else{
+          if($length_materials != 0){
                   echo "<div class='container'>  
-                              <div>
-                                <table class='table table-hover table-response'>
-                                  <thead class='thead-dark'>
-                                    <tr>
-                                        <th scope='col'>Código Área</th>
-                                        <th scope='col'>Nombre</th>
-                                        <th scope='col'>Subárea</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>";
-                            for ($i = 0; $i < $length_areas; $i++) {
-                              echo "<tr>
-                                      <td scope='row'>" . $areas[$i][1] . "</td>
-                                      <td scope='row'> " . $areas[$i][2] . "</td>
-                                      <td scope='row'>" . (is_null($areas[$i][3]) ? 'No tiene' : $areas[$i][3]) . "</td>
-                                    </tr>";
-                            }
-                            echo "</tbody>  
-                                </table>
-                              </div>
-                            </div>
-                        </main>
-                      </div>
+                  <div>
+                  <br><br>
+                    <table class='table table-hover table-response'>
+                      <thead class='thead-dark'>
+                        <tr>
+                            <th scope='col'>Código Material</th>
+                            <th scope='col'>Título</th>
+                            <th scope='col'>Descripcion</th>
+                            <th scope='col'>Imagen</th>
+                            <th scope='col'>Nombre Autor</th>
+                            <th scope='col'>Área</th>
+                            <th scope='col'>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>";
+                for ($i = 0; $i < $length_materials; $i++) {
+                  echo "<tr>
+                          <td scope='row'>" . $materials[$i][1] . "</td>
+                          <td scope='row'>" . $materials[$i][2] . "</td>
+                          <td scope='row' title='".$materials[$i][3]."'>" . substr($materials[$i][3],0,10) . "...</td>
+                          <td scope='row'><a href='../material_images/" . $materials[$i][4] . "' target='_blank' download class='alert-link'>Ver imagen <span><i class='far fa-hand-pointer'></i></span></a></td>
+                          <td scope='row' title='".$materials[$i][6]."'>" . substr($materials[$i][6],0,10) . "...</td>
+                          <td scope='row'>" . $materials[$i][8] . "</td>
+                          <td scope='row' title='Realizar acciones'>
+                            <form name='materialForm' method='POST' action='MaterialView.php'>
+                              <button type='submit' class='btn btn-dark align-middle justify-content-center' value='materialActions' >
+                                <span><i class='fas fa-toolbox'></i><span>
+                              </button>
+                            </form>
+                          </td>
+                        </tr>";
+                }
+                echo "</tbody>  
+                    </table>
                   </div>
-
+                </div>";
+          }else{
+            echo "<div class='container'><h3>No hay materiales disponibles. Crea un nuevo material</h3></div>";
+          }
+                
+      }
+  echo "
+              </main>
+              </div>
+            </div>
   <script src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo'
     crossorigin='anonymous'></script>
   <script src='https://unpkg.com/feather-icons/dist/feather.min.js'></script>

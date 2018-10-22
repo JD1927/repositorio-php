@@ -7,12 +7,12 @@ class MaterialModel
   var $image = "";
 
 
-  function MaterialModel($cod_material, $title, $description, $image)
+  function MaterialModel($cod_material, $title, $description, $img)
   {
     $this->cod_material = $cod_material;
     $this->title = $title;
     $this->description = $description;
-    $this->$image = $image;
+    $this->image = $img;
   }
 
   function getCodMaterial()
