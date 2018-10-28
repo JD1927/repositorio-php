@@ -285,16 +285,18 @@ echo "<!DOCTYPE html>
       </nav>
 
       <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>";
+      
       if($materialTools){
         echo "<div class='container'>
+          <form name='materialForm' method='GET' title='Ver tabla de materiales' action='MaterialView.php'>
+              <button type='submit' class='btn btn-success btn-block' value='materialActions' name='materialActions'>
+                Ver lista de materiales <span><i class='fas fa-table'></i><span>
+              </button>
+          </form>
+          <br>
           <div class='card'>
           <div class='card-header' style='text-align: center;'>
           <h4>Material</h4>
-          <form name='materialForm' method='GET' title='Ver tabla de materiales' action='MaterialView.php'>
-              <button type='submit' class='btn btn-dark' value='materialActions' name='materialActions'>
-                <span><i class='far fa-eye'></i><span>
-              </button>
-          </form>
           </div>
             <div class='card-body'>
               <form name='materialForm' method='POST' action='MaterialView.php' enctype='multipart/form-data'>
@@ -344,17 +346,17 @@ echo "<!DOCTYPE html>
                 <div class='form-group'>
                   <div class='row'>
                     <div class='col-md-6'>
-                      <button type='submit' name='create' value='create' class='btn btn-success btn-block'>
+                      <button type='submit' name='create' value='create' class='btn btn-dark btn-block'>
                       <span><i class='fas fa-user-plus'></i></span> Crear</button>
 
-                      <button type='submit' name='read' value='read' class='btn btn-primary btn-block'>
+                      <button type='submit' name='read' value='read' class='btn btn-dark btn-block'>
                       <span><i class='fas fa-search'></i></span> Consultar</button>
                     </div>
                     <div class='col-md-6'>
                       <button type='submit' name='update' value='update' class='btn btn-dark btn-block'>
                       <span><i class='fas fa-wrench'></i></span> Actualizar</button>
                           
-                      <button type='submit' name='delete' value='delete' class='btn btn-danger btn-block'>
+                      <button type='submit' name='delete' value='delete' class='btn btn-dark btn-block'>
                       <span><i class='fas fa-trash'></i></span> Eliminar</button>
                     </div>
                     
@@ -378,7 +380,12 @@ echo "<!DOCTYPE html>
           if($length_materials != 0){
                   echo "<div class='container'>  
                   <div>
-                  <br><br>
+                  <form name='materialForm' method='POST' action='MaterialView.php'>
+                    <button type='submit' class='btn btn-success btn-block' value='materialActions' >
+                      <span><i class='fas fa-arrow-circle-left'></i><span> Volver
+                    </button>
+                  </form>
+                  <br>
                     <table class='table table-hover table-response'>
                       <thead class='thead-dark'>
                         <tr>
@@ -388,7 +395,7 @@ echo "<!DOCTYPE html>
                             <th scope='col'>Imagen</th>
                             <th scope='col'>Nombre Autor</th>
                             <th scope='col'>Área</th>
-                            <th scope='col'>Acciones</th>
+                            <th scope='col' style='text-align:center;'>Acciones</th>
                         </tr>
                       </thead>
                       <tbody>";
@@ -397,15 +404,28 @@ echo "<!DOCTYPE html>
                           <td scope='row'>" . $materials[$i][1] . "</td>
                           <td scope='row'>" . $materials[$i][2] . "</td>
                           <td scope='row' title='".$materials[$i][3]."'>" . substr($materials[$i][3],0,10) . "...</td>
-                          <td scope='row'><a href='../material_images/" . $materials[$i][4] . "' target='_blank' download class='alert-link'>Ver imagen <span><i class='far fa-hand-pointer'></i></span></a></td>
+                          <td scope='row'><a href='../material_images/" . $materials[$i][4] . "' target='_blank' download class='alert-link'>".$materials[$i][4]." <span><i class='fas fa-download'></i></span></a></td>
                           <td scope='row' title='".$materials[$i][6]."'>" . substr($materials[$i][6],0,10) . "...</td>
                           <td scope='row'>" . $materials[$i][8] . "</td>
                           <td scope='row' title='Realizar acciones'>
-                            <form name='materialForm' method='POST' action='MaterialView.php'>
-                              <button type='submit' class='btn btn-dark align-middle justify-content-center' value='materialActions' >
-                                <span><i class='fas fa-toolbox'></i><span>
-                              </button>
-                            </form>
+                          <div class='row'>
+                            <div class='col col-md-6'>
+                              <form name='metadataForm' method='GET' title='Agregar metadata del material' action='MetadataView.php'>
+                                <input type='hidden' id='cod_material' name='cod_material' value='".$materials[$i][1]."'>
+                                <button type='submit' class='btn btn-dark btn-block'>
+                                  <span title='Crear metadata del material'><i class='fas fa-folder-plus'></i><span>
+                                </button>
+                              </form>
+                            </div>
+                            <div class='col col-md-6'>
+                              <form name='metadataListForm' method='GET' title='Ver lista de metadata del material' action='MetadataListView.php'>
+                                <input type='hidden' id='cod_m_metadata' name='cod_m_metadata' value='".$materials[$i][1]."'>
+                                <button type='submit' class='btn btn-dark btn-block'>
+                                  <span title='Consultar metadata del material'><i class='fas fa-list-alt'></i><span>
+                                </button>
+                              </form>
+                            </div>
+                          </div>
                           </td>
                         </tr>";
                 }

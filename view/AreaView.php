@@ -222,12 +222,12 @@ echo "<!DOCTYPE html>
                     <div class='form-group'>
                       <div class='row'>
                         <br><br>
-                          <button type='submit' name='create' value='create' class='btn btn-success btn-block'>
+                          <button type='submit' name='create' value='create' class='btn btn-dark btn-block'>
                             <span>
                               <i class='fas fa-user-plus'></i>
                             </span> Crear</button>
                         
-                          <button type='submit' name='read' value='read' class='btn btn-primary btn-block'>
+                          <button type='submit' name='read' value='read' class='btn btn-dark btn-block'>
                             <span>
                               <i class='fas fa-search'></i>
                             </span> Consultar</button>
@@ -237,7 +237,7 @@ echo "<!DOCTYPE html>
                               <i class='fas fa-wrench'></i>
                             </span> Actualizar</button>
                         
-                          <button type='submit' name='delete' value='delete' class='btn btn-danger btn-block'>
+                          <button type='submit' name='delete' value='delete' class='btn btn-dark btn-block'>
                             <span>
                               <i class='fas fa-trash'></i>
                             </span> Eliminar</button>

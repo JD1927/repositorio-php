@@ -121,7 +121,7 @@ try {
         <input type="text" class="form-control" id="pwd" name="password" placeholder="Contraseña" autocomplete="off">
       </div>
     </div>
-    <button class="btn btn-lg btn-success btn-block" style="border-radius: 25px;" name="sign-in" type="submit" value="sign-in">Ingresar</button>
+    <button class="btn btn-lg btn-dark btn-block" style="border-radius: 25px;" name="sign-in" type="submit" value="sign-in">Ingresar</button>
   </form>
   <footer style="color:white;"><!--Estudiantes-->
     &copy; Estudiantes<br> 
