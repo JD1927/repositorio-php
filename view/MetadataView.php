@@ -256,10 +256,19 @@ echo "<!DOCTYPE html>
             <li class='nav-item'>
               <a class='nav-link active' href='MaterialView.php'>
                 <span><i class='fas fa-box'></i></span>
-                Material
+                Materiales
               </a>
-            </li>
-          </ul>
+            </li>";
+            if($_SESSION['rol'] == 1){
+              echo "
+              <li class='nav-item'>
+                <a class='nav-link' href='UserView.php'>
+                  <span><i class='fas fa-user-shield'></i></span>
+                  Usuarios
+                </a>
+              </li>";
+            }
+          echo "</ul>
         </div>
       </nav>
 

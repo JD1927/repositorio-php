@@ -8,8 +8,10 @@ if ($_SESSION["name"]) {
   header('Location: HomeView.php');
 }
 //Importa el control y el modelo de usuarios
-include("../control/ctrUser.php");
+include("../control/CtrUser.php");
 include("../model/UserModel.php");
+include("../control/CtrConnection.php");
+
 $name = "";
 $password = "";
 
@@ -21,11 +23,11 @@ try {
     $name = $_POST["user"];
 
     //Envía usuario y contraseña al modelo de usuario
-    $objUserModel = new UserModel($name, $password);
-    $ctrUser = new ctrUser($objUserModel);
+    $objUserModel = new UserModel($name, $password, null);
+    $CtrUser = new CtrUser($objUserModel);
 
     //Validar usuario
-    $ctrUser->validate_user();
+    $CtrUser->validate_user();
 
     //Obtiene los valores de los campos
     $NOMBRE = $objUserModel->getName();

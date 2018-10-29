@@ -4,11 +4,13 @@ class UserModel
 	var $password;
 	var $name;
 	var $rol;
+	var $nationality;
 
-	function UserModel($name, $password)
+	function UserModel($name, $password,$rol)
 	{
 		$this->password = $password;
 		$this->name = $name;
+		$this->rol = $rol;
 	}
 
 	function getPassword()

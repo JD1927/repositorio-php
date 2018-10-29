@@ -1,24 +1,26 @@
 <?php
 error_reporting(0);
+//Inicia la sesión
 session_start();
-if (!$_SESSION["name"]) {
+//Valida que dentro de la sesión estén todos los valores requeridos para acceder a la página
+if (((!$_SESSION["name"]) && (!$_SESSION["password"]) && (!$_SESSION["rol"])) || ($_SESSION['rol'] != 1)) {
   header('Location: index.php');
 }
 //Incluye código 
-include("../model/AreaModel.php");
-include("../control/CtrArea.php");
+include("../model/UserModel.php");
+include("../control/CtrUser.php");
 include("../control/CtrConnection.php");
 
 //Variables
 $name = "";
-$subarea = "";
-$cod = "";
+$id = "";
+$rol = "Selecciona un rol...";
 $message = null;
 
-//Listar áreas
-$objArea = new AreaModel(null, null, null);
-$objCtrArea = new CtrArea($objArea);
-$mat = $objCtrArea->area_list();
+//Listar Usuarios
+$objUser = new UserModel(null, null, null, null);
+$objCtrUser = new CtrUser($objUser);
+$mat = $objCtrUser->user_list();
 $length = count($mat);
 
   //create
@@ -27,21 +29,21 @@ if ($_POST["create"] == "create") {
   try {
     //setting values
     $name = $_POST["name"];
-    $subarea = $_POST["subarea"];
-    $cod = $_POST["cod"];
+    $id = $_POST["id"];
+    $rol = $_POST["rol"];
 
-    $objArea = new AreaModel($cod, $name, $subarea);
-    $objCtrArea = new CtrArea($objArea);
+    $objUser = new UserModel($name, $id, $rol);
+    $objCtrUser = new CtrUser($objUser);
 
-    $objCtrArea->create();
+    $objCtrUser->create();
     //Esta variable se usa para mostrar un mensaje de alerta
-    $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+    $message = "¡Se creó el usuario: " . $name . " exitosamente!";
     //Vacia los variables correspondientes al área
     $name = "";
-    $subarea = "";
-    $cod = "";
+    $id = "";
+    $rol = "Selecciona un rol...";
 
-    $mat = $objCtrArea->area_list();
+    $mat = $objCtrUser->user_list();
     $length = count($mat);
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -53,22 +55,25 @@ if ($_POST["read"] == "read") {
 
   try {
     //setting values
-    $cod = $_POST["cod"];
-    $objArea = new AreaModel($cod, null, null);
-    $objCtrArea = new CtrArea($objArea);
+    $id = $_POST["id"];
+    $objUser = new UserModel(null, $id, null);
+    $objCtrUser = new CtrUser($objUser);
 
-    $objCtrArea->read();
+    $objCtrUser->read();
 
-    $cod = $objArea->getcodArea();
-    $name = $objArea->getName();
-    $subarea = $objArea->getSubarea();
+    $id = $objUser->getPassword();
+    $name = $objUser->getName();
+    $rol = $objUser->getRol();
 
-    if ((!is_null($cod) && (!empty($cod)))) {
+    if ((!is_null($id) && (!empty($id)))) {
       //Esta variable se usa para mostrar un mensaje de alerta
-      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+      $message = "¡Se consultó el usuario con identificación: " . $id . " exitosamente!";
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡No se encontró el usuario con la identificación ingresada!";
+      $rol = "Selecciona un rol...";
     }
+    $mat = $objCtrUser->user_list();
+    $length = count($mat);
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
   }
@@ -79,23 +84,24 @@ if ($_POST["update"] == "update") {
   try {
     //setting values
     $name = $_POST["name"];
-    $subarea = $_POST["subarea"];
-    $cod = $_POST["cod"];
+    $id = $_POST["id"];
+    $rol = $_POST["rol"];
 
-    $objArea = new AreaModel($cod, $name, $subarea);
-    $objCtrArea = new CtrArea($objArea);
+    $objUser = new UserModel($name, $id, $rol);
+    $objCtrUser = new CtrUser($objUser);
 
-    if ($objCtrArea->update()) {
-      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+    if ($objCtrUser->update()) {
+      $message = "¡Se actualizó el usuario con identificación: " . $id . " exitosamente!";
       //Vacia los variables correspondientes al área
       $name = "";
-      $subarea = "";
-      $cod = "";
+      $id = "";
+      $rol = "Selecciona un rol...";
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡No se encontró el usuario con la identificación ingresada!";
+      $rol = "Selecciona un rol...";
     }
 
-    $mat = $objCtrArea->area_list();
+    $mat = $objCtrUser->user_list();
     $length = count($mat);
 
   } catch (Exception $exp) {
@@ -108,21 +114,23 @@ if ($_POST["delete"] == "delete") {
 
   try {
 
-    $cod = $_POST["cod"];
+    $id = $_POST["id"];
 
-    $objArea = new AreaModel($cod, null, null);
-    $objCtrArea = new CtrArea($objArea);
+    $objUser = new UserModel(null, $id, null);
+    $objCtrUser = new CtrUser($objUser);
 
-    if ($objCtrArea->delete()) {
-      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+    if ($objCtrUser->delete()) {
+      $message = "¡Se eliminó el usuario de identificación: " . $id . " exitosamente!";
             //Vacia los variables correspondientes al área
       $name = "";
-      $subarea = "";
-      $cod = "";
+      $id = "";
+      $rol = "Selecciona un rol...";
+
     } else {
-      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span> <span><i class='fas fa-frown'></i></span>";
+      $message = "¡No se encontró el la identificación del usuario ingresado!";
+      $rol = "Selecciona un rol...";
     }
-    $mat = $objCtrArea->area_list();
+    $mat = $objCtrUser->user_list();
     $length = count($mat);
 
   } catch (Exception $exp) {
@@ -167,33 +175,33 @@ echo "<!DOCTYPE html>
       <nav class='col-md-2 d-none d-md-block bg-light sidebar'>
         <div class='sidebar-sticky'>
           <ul class='nav flex-column'>
-            <li class='nav-item'>
-              <a class='nav-link' href='HomeView.php'>
-                <span><i class='fas fa-home'></i></span>
-                Inicio
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link active' href='AreaView.php'>
-                <span><i class='fas fa-square-root-alt'></i></span>
-                Áreas
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link' href='MaterialView.php'>
-                <span><i class='fas fa-box'></i></span>
-                Materiales
-              </a>
-            </li>";
-            if($_SESSION['rol'] == 1){
-              echo "
-              <li class='nav-item'>
-                <a class='nav-link' href='UserView.php'>
-                  <span><i class='fas fa-user-shield'></i></span>
-                  Usuarios
-                </a>
-              </li>";
-            }
+          <li class='nav-item'>
+          <a class='nav-link' href='HomeView.php'>
+            <span><i class='fas fa-home'></i></span>
+            Inicio
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='AreaView.php'>
+            <span><i class='fas fa-square-root-alt'></i></span>
+            Áreas
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='MaterialView.php'>
+            <span><i class='fas fa-box'></i></span>
+            Materiales
+          </a>
+        </li>";
+        if($_SESSION['rol'] == 1){
+          echo "
+          <li class='nav-item'>
+            <a class='nav-link active' href='UserView.php'>
+              <span><i class='fas fa-user-shield'></i></span>
+              Usuarios
+            </a>
+          </li>";
+        }
           echo "</ul>
         </div>
       </nav>
@@ -201,29 +209,31 @@ echo "<!DOCTYPE html>
       <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>
         <div class='container'>
           <div class='card'>
-          <div class='card-header' style='text-align: center;'><h4>Área</h4></div>
+          <div class='card-header' style='text-align: center;'><h4>Usuario</h4></div>
             <div class='card-body'>
-              <form name='areaForm' method='POST' action='AreaView.php'>
+              <form name='areaForm' method='POST' action='UserView.php'>
                 <div class='row'>
                   <div class='col-md-6'>
                   <div class='form'>
                   <div class='input-group mb-3'>
                     <div class='input-group-prepend'>
-                      <span class='input-group-text' id='cod'>Código</span>
+                      <span class='input-group-text' id='cod'>Identificación</span>
                     </div>
-                    <input type='text' class='form-control' value='" . $cod . "' name='cod' placeholder='Código de área' autocomplete='off'>
+                    <input type='text' class='form-control' value='" . $id . "' name='id' placeholder='Número de identificación' autocomplete='off'>
                   </div>
                   <div class='input-group mb-3'>
                     <div class='input-group-prepend'>
-                      <span class='input-group-text' id='name'>Nombre</span>
+                      <span class='input-group-text' id='name'>Nombre de usuario</span>
                     </div>
-                    <input type='text' class='form-control' value='" . $name . "' name='name' placeholder='Nombre del área' autocomplete='off'>
+                    <input type='text' class='form-control' value='" . $name . "' name='name' placeholder='Nombre de usuario' autocomplete='off'>
                   </div>
                   <div class='input-group mb-3'>
-                    <div class='input-group-prepend'>
-                      <span class='input-group-text' id='subarea'>Subárea</span>
-                    </div>
-                    <input type='text' class='form-control' value='" . $subarea . "' name='subarea' placeholder='Subárea' autocomplete='off'>
+                    <select id='rol' name='rol' class='form-control custom-select'>
+                      <option selected>".$rol."</option>
+                      <option value='1'>Administrador</option>
+                      <option value='2'>Estudiante</option>
+                      <option value='3'>Profesor</option>
+                    </select>
                   </div>
                 </div>
                   </div>
@@ -256,36 +266,36 @@ echo "<!DOCTYPE html>
               </div>
             </div>
           </div>";
-          if (!is_null($message)) {
-            echo "<div class='alert alert-dark' role='alert'>
-                                          " . $message . "
-                  </div>";
-          }
-            echo "<div class='container'>  
+                    if (!is_null($message)) {
+                    echo "<div class='alert alert-dark' role='alert'>
+                        " . $message . "
+                          </div>";
+                      }
+                      echo "<div class='container'>  
                               <div>
                                 <table class='table table-hover table-response'>
                                   <thead class='thead-dark'>
                                     <tr>
-                                        <th scope='col'>Código Área</th>
-                                        <th scope='col'>Nombre</th>
-                                        <th scope='col'>Subárea</th>
+                                        <th scope='col'>Identificación</th>
+                                        <th scope='col'>Nombre de usuario</th>
+                                        <th scope='col'>Rol</th>
                                     </tr>
                                   </thead>
                                   <tbody>";
-            for ($i = 0; $i < $length; $i++) {
+                            for ($i = 0; $i < $length; $i++) {
                               echo "<tr>
                                       <td scope='row'>" . $mat[$i][1] . "</td>
                                       <td scope='row'> " . $mat[$i][2] . "</td>
                                       <td scope='row'>" . (is_null($mat[$i][3]) ? 'No tiene' : $mat[$i][3]) . "</td>
                                     </tr>";
-}
+                            }
                             echo "</tbody>  
                                 </table>
                               </div>
                             </div>
                         </main>
-                      </div>
-                  </div>
+    </div>
+  </div>
 
   <script src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo'
     crossorigin='anonymous'></script>
