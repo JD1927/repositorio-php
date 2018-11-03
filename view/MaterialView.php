@@ -288,8 +288,11 @@ echo "<!DOCTYPE html>
           <div class='card'>
           <div class='card-header' style='text-align: center;'>
           <h4>Material</h4>
-          </div>
-            <div class='card-body'>
+          </div>";
+          if($image != '' || $image != null){
+            echo "<img class='card-img-top' src='../material_images/".$image."'>";
+          }
+            echo "<div class='card-body'>
               <form name='materialForm' method='POST' action='MaterialView.php' enctype='multipart/form-data'>
                 <div class='form'>
                   <div class='form-row'>
