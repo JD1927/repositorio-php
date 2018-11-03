@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.2
--- http://www.phpmyadmin.net
+-- version 4.8.3
+-- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 11-10-2018 a las 17:03:38
--- Versión del servidor: 10.1.13-MariaDB
--- Versión de PHP: 5.6.20
+-- Tiempo de generación: 03-11-2018 a las 01:20:36
+-- Versión del servidor: 10.1.36-MariaDB
+-- Versión de PHP: 5.6.38
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -37,10 +39,9 @@ CREATE TABLE `area` (
 --
 
 INSERT INTO `area` (`IDAREA`, `NOMBRE`, `FKAREA`) VALUES
-(10, 'HOLA_123', 20),
-(20, 'HOLA', 10),
-(30, 'AREA_3', NULL),
-(40, 'AREA', 10);
+(10, 'AREA_10', 20),
+(20, 'AREA_20', NULL),
+(30, 'AREA_3', NULL);
 
 -- --------------------------------------------------------
 
@@ -53,6 +54,14 @@ CREATE TABLE `autor` (
   `NOMBRE` varchar(255) NOT NULL,
   `NACIONALIDAD` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `autor`
+--
+
+INSERT INTO `autor` (`IDAUTOR`, `NOMBRE`, `NACIONALIDAD`) VALUES
+(16108017, 'JUANCHILAS', 'VENEZOLANA'),
+(1036685232, 'JUAN DAVID AGUIRRE CORDOBA', 'COLOMBIANA');
 
 -- --------------------------------------------------------
 
@@ -67,6 +76,13 @@ CREATE TABLE `material` (
   `IMAGEN` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Volcado de datos para la tabla `material`
+--
+
+INSERT INTO `material` (`IDMATERIAL`, `TITULO`, `DESCRIPCION`, `IMAGEN`) VALUES
+(12, 'Repositorio', 'Repositorio de datos', 'dream.jpg');
+
 -- --------------------------------------------------------
 
 --
@@ -76,6 +92,7 @@ CREATE TABLE `material` (
 CREATE TABLE `metadata` (
   `IDMETADATA` int(11) NOT NULL,
   `TIPO` varchar(255) NOT NULL,
+  `METADATA` varchar(255) NOT NULL,
   `FECHAINGRESO` date NOT NULL,
   `FECHAMODIFICACION` date NOT NULL,
   `USUARIOINGRESO` varchar(255) NOT NULL,
@@ -85,6 +102,13 @@ CREATE TABLE `metadata` (
   `COSTO` decimal(10,0) NOT NULL,
   `IDMATERIAL` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `metadata`
+--
+
+INSERT INTO `metadata` (`IDMETADATA`, `TIPO`, `METADATA`, `FECHAINGRESO`, `FECHAMODIFICACION`, `USUARIOINGRESO`, `AUDIENCIA`, `COMPATIBILIDAD`, `IDIOMA`, `COSTO`, `IDMATERIAL`) VALUES
+(1, 'TIPOS', 'Repositorio.zip', '2018-11-03', '2018-11-03', 'JD1917', 'ESTUDIANTES', b'0', 'Espa?ol', '2000', 12);
 
 -- --------------------------------------------------------
 
@@ -108,6 +132,13 @@ CREATE TABLE `relacionareamaterial` (
   `IDAREA` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Volcado de datos para la tabla `relacionareamaterial`
+--
+
+INSERT INTO `relacionareamaterial` (`IDMATERIAL`, `IDAREA`) VALUES
+(12, 10);
+
 -- --------------------------------------------------------
 
 --
@@ -118,6 +149,13 @@ CREATE TABLE `relacionmaterialautor` (
   `IDMATERIAL` int(11) NOT NULL,
   `IDAUTOR` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `relacionmaterialautor`
+--
+
+INSERT INTO `relacionmaterialautor` (`IDMATERIAL`, `IDAUTOR`) VALUES
+(12, 1036685232);
 
 -- --------------------------------------------------------
 
@@ -146,7 +184,9 @@ CREATE TABLE `rol` (
 --
 
 INSERT INTO `rol` (`IDROL`, `NOMBRE`) VALUES
-(1, 'ADMINISTRADOR');
+(1, 'ADMINISTRADOR'),
+(2, 'ESTUDIANTE'),
+(3, 'PROFESOR');
 
 -- --------------------------------------------------------
 
@@ -165,7 +205,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`IDUSUARIO`, `NOMBRE`, `IDROL`) VALUES
-(16108017, 'JUAN1927', 1);
+(16108017, 'JD1917', 1),
+(1036685232, 'JUAN', 2);
 
 --
 -- Índices para tablas volcadas
@@ -245,12 +286,14 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `material`
 --
 ALTER TABLE `material`
-  MODIFY `IDMATERIAL` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDMATERIAL` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
 --
 -- AUTO_INCREMENT de la tabla `metadata`
 --
 ALTER TABLE `metadata`
-  MODIFY `IDMETADATA` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDMETADATA` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -293,6 +336,7 @@ ALTER TABLE `relacionrolpermiso`
 --
 ALTER TABLE `usuario`
   ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`IDROL`) REFERENCES `rol` (`IDROL`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
