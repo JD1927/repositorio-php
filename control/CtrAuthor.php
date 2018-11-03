@@ -133,7 +133,7 @@ class CtrAuthor
 
     $registro = mysql_fetch_array($recordSet);
 
-    $this->objAutor->setIdAutor($registro['IDAUTOR']);
+    $this->objAutor->setIdAuthor($registro['IDAUTOR']);
     $this->objAutor->setName($registro['NOMBRE']);
     $this->objAutor->setNacionality($registro['NACIONALIDAD']);
 

@@ -1,7 +1,7 @@
 <?php
 error_reporting(0);
 session_start();
-if (!$_SESSION["name"]) {
+if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
   header('Location: index.php');
 }
 //Incluye código 

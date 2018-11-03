@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 //Inicia la sesión
 session_start();
 //Valida que dentro de la sesión estén todos los valores requeridos para acceder a la página
@@ -320,7 +320,7 @@ echo "<div class='container'>
                       <label for='compatibility'>Compatibilidad</label>
                       <select id='compatibility' name='compatibility' class='form-control custom-select'>";
                         if($_REQUEST['cod_m_material']){
-                          echo "<option value='".$compatibility."' selected>" . (($compatibility == true || $compatibility == 1)?'Compatible':'No Compatible') . "</option>";
+                          echo "<option value='".$compatibility."' selected>" . (($compatibility == 1)?'Compatible':'No Compatible') . "</option>";
                         }else{
                           echo "<option selected>" . $compatibility . "</option>";
                         }
