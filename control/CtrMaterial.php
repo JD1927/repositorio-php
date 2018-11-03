@@ -3,13 +3,17 @@ class CtrMaterial
 {
   var $objMaterial;
   var $objArea;
+  var $objAuthor;
   var $recordSet;
-  function CtrMaterial($objMaterial, $objArea)
+  
+  function CtrMaterial($objMaterial, $objArea, $objAuthor)
   {
     //Obtiene el objeto de MaterialModel
     $this->objMaterial = $objMaterial;
     //Obtiene el objeto de AreaModel
     $this->objArea = $objArea;
+    //Obtiene el objeto de AuthorModel
+    $this->objAuthor = $objAuthor;
   }
 
   function create()
@@ -21,7 +25,7 @@ class CtrMaterial
     $image = $this->objMaterial->getImage();
     
     //relacionmaterialautor -->$cod_material
-    $cod_author = 1036685232; //$this->objMaterial->getAuthor();
+    $cod_author = $this->objAuthor->getIdAuthor();
     //relacionareamaterial -->$cod_material
     $cod_area = $this->objArea->getCodArea();
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
@@ -117,7 +121,7 @@ class CtrMaterial
     //Area
     $cod_area = $this->objArea->getCodArea();
     //Author
-    $cod_author = 1036685232;
+    $cod_author = $this->objAuthor->getIdAuthor();
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
@@ -128,17 +132,21 @@ class CtrMaterial
     $recordSet4 = $objConnection->executeSQL($bd, $sentenceImage);
     $select_material = mysql_fetch_array($recordSet4);
     $old_image = $select_material['IMAGEN'];
-
-    if ($old_image != $image) {
-      //Borrando archivo
-      if (!unlink('../material_images/' . $old_image)) {
-        die("Se presentó un error borrando el archivo" . $old_image);
+    
+    if(!is_null($image)){
+      if ($old_image != $image) {
+        //Borrando archivo
+        if (!unlink('../material_images/' . $old_image)) {
+          die("Se presentó un error borrando el archivo" . $old_image);
+        }
       }
+      //Actualiza el material
+      $sentenceMaterial = "UPDATE material SET TITULO='" . $title . "',DESCRIPCION='" . $description . "',IMAGEN='" . $image . "' WHERE IDMATERIAL = " . $cod_material . "";
+      $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
+    }else{
+      $sentenceMaterial = "UPDATE material SET TITULO='" . $title . "',DESCRIPCION='" . $description . "' WHERE IDMATERIAL = " . $cod_material . "";
+      $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
     }
-        
-    //Actualiza el material
-    $sentenceMaterial = "UPDATE material SET TITULO='" . $title . "',DESCRIPCION='" . $description . "',IMAGEN='" . $image . "' WHERE IDMATERIAL = " . $cod_material . "";
-    $recordSet = $objConnection->executeSQL($bd, $sentenceMaterial);
 
     //Relaciona Material con Autor
     $sentenceRelationMA = "UPDATE relacionmaterialautor SET IDAUTOR=" . $cod_author . " WHERE IDMATERIAL = " . $cod_material . "";
@@ -184,6 +192,10 @@ class CtrMaterial
     //Elimina la relacion Area con Material
     $sentenceRelationAM = "DELETE FROM relacionareamaterial WHERE IDMATERIAL =" . $cod_material . "";
     $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
+
+    //Elimina el metadata
+    $sentenceMetadata = "DELETE FROM metadata WHERE IDMATERIAL =" . $cod_material . "";
+    $recordSet5 = $objConnection->executeSQL($bd, $sentenceMetadata);
 
     //Elimina el material
     $sentenceMaterial = "DELETE FROM material WHERE IDMATERIAL =" . $cod_material . "";
@@ -237,6 +249,9 @@ class CtrMaterial
     $this->objMaterial->setImage($search['IMAGEN']);
     $this->objArea->setCodArea($search['IDAREA']);
     $this->objArea->setName($search['AREA']);
+    $this->objAuthor->setIdAuthor($search['IDAUTOR']);
+    $this->objAuthor->setName($search['AUTHOR']);
+    
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {

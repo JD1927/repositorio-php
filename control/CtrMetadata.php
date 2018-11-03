@@ -15,7 +15,7 @@ class CtrMetadata
   function create()
   {
     //Obtiene los valores ingresados en la vista
-    //$cod_metadadata = $this->objMetadata->getCodMetadata();
+    //$cod_metadata = $this->objMetadata->getCodMetadata();
     $type = $this->objMetadata->getTypeMetadata();
     $metadata = $this->objMetadata->getMetadata();
     $date_created = $this->objMetadata->getDateCreated();
@@ -26,7 +26,6 @@ class CtrMetadata
     $language = $this->objMetadata->getLanguage();
     $cost = $this->objMetadata->getCost();
     $cod_material = $this->objMaterial->getCodMaterial();
-    
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
@@ -45,6 +44,7 @@ class CtrMetadata
     '" . $audency . "', " . $compatibility . ", '" . $language . "', 
     " . $cost . ", " . $cod_material . ")";
     $recordSet = $objConnection->executeSQL($bd, $sentenceMetadata);
+
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {
@@ -74,7 +74,7 @@ class CtrMetadata
     IDMETADATA,TIPO,METADATA,
     FECHAINGRESO,FECHAMODIFICACION,USUARIOINGRESO,
     AUDIENCIA,COMPATIBILIDAD,
-    IDIOMA,COSTO FROM metadata WHERE IDMATERIAL = ".$cod_material."";
+    IDIOMA,COSTO,IDMATERIAL FROM metadata WHERE IDMATERIAL = " . $cod_material . "";
 
             //  echo " Comando SQL : ". $sentence;
     //Obtiene los registros de la consulta
@@ -82,7 +82,7 @@ class CtrMetadata
     //Inicializa el contador
     $i = 0;
     //Inicializa las dimensiones del array bidimiensional de áreas
-    $mat[0][0] = 10;
+    $mat[0][0] = 11;
     //Recorre el array y incrementa el valor de contador
     while ($search = mysql_fetch_array($recordSet)) {
       $mat[$i][1] = $search['IDMETADATA'];
@@ -95,6 +95,7 @@ class CtrMetadata
       $mat[$i][8] = $search['COMPATIBILIDAD'];
       $mat[$i][9] = $search['IDIOMA'];
       $mat[$i][10] = $search['COSTO'];
+      $mat[$i][11] = $search['IDMATERIAL'];
       $i = $i + 1;
     }
     //Cierra la conexión con la BD
@@ -107,44 +108,55 @@ class CtrMetadata
   function update()
   {
     //Obtiene los campos ingresados en la vista
-    //Material
+    $cod_metadata = $this->objMetadata->getCodMetadata();
+    $type = $this->objMetadata->getTypeMetadata();
+    $date_updated = $this->objMetadata->getDateUpdated();
+    $user = $this->objMetadata->getUser();
+    $metadata = $this->objMetadata->getMetadata();
+    $audency = $this->objMetadata->getAudency();
+    $compatibility = $this->objMetadata->getCompatibility();
+    $language = $this->objMetadata->getLanguage();
+    $cost = $this->objMetadata->getCost();
     $cod_material = $this->objMaterial->getCodMaterial();
-    $title = $this->objMaterial->getTitle();
-    $description = $this->objMaterial->getDescription();
-    $image = $this->objMaterial->getImage();
-    //Area
-    $cod_area = $this->objArea->getCodArea();
-    //Author
-    $cod_author = 1036685232;
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-    //Consultar imagen del material
-    $sentenceImage = "SELECT IMAGEN FROM material WHERE IDMATERIAL =" . $cod_material . "";
-    $recordSet4 = $objConnection->executeSQL($bd, $sentenceImage);
-    $select_material = mysql_fetch_array($recordSet4);
-    $old_image = $select_material['IMAGEN'];
-
-    if ($old_image != $image) {
-      //Borrando archivo
-      if (!unlink('../material_images/' . $old_image)) {
-        die("Se presentó un error borrando el archivo" . $old_image);
-      }
-    }
-        
-    //Actualiza el material
-    $sentenceMetadata = "UPDATE material SET TITULO='" . $title . "',DESCRIPCION='" . $description . "',IMAGEN='" . $image . "' WHERE IDMATERIAL = " . $cod_material . "";
-    $recordSet = $objConnection->executeSQL($bd, $sentenceMetadata);
-
-    //Relaciona Material con Autor
-    $sentenceRelationMA = "UPDATE relacionmaterialautor SET IDAUTOR=" . $cod_author . " WHERE IDMATERIAL = " . $cod_material . "";
-    $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
+    //Consultar zip del metadata
+    $sentenceZip = "SELECT METADATA FROM metadata WHERE IDMETADATA =" . $cod_metadata . "";
+    $recordSet4 = $objConnection->executeSQL($bd, $sentenceZip);
+    $select_metadata = mysql_fetch_array($recordSet4);
+    $old_metadata = $select_metadata['METADATA'];
     
-    //Relacion Area con Material
-    $sentenceRelationAM = "UPDATE relacionareamaterial SET IDAREA=" . $cod_area . " WHERE IDMATERIAL=" . $cod_material . "";
-    $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
+    if(!is_null($metadata)){
+      if ($old_metadata != $metadata) {
+        //Borrando archivo
+        if (!unlink('../metadata/' . $old_metadata)) {
+          die("Se presentó un error borrando el archivo" . $old_metadata);
+        }
+      }
+      //Actualiza el metadata
+      $sentenceMetadata = "UPDATE metadata 
+      SET TIPO = '".$type."', 
+      FECHAMODIFICACION = '".$date_updated."', 
+      AUDIENCIA = '".$audency."', 
+      METADATA = '".$metadata."', 
+      COMPATIBILIDAD = ".$compatibility.", 
+      IDIOMA = '".$language."', COSTO = ".$cost." 
+      WHERE IDMETADATA = ".$cod_metadata."";
+      $recordSet = $objConnection->executeSQL($bd, $sentenceMetadata);
+    }else{
+      $sentenceMetadata = "UPDATE metadata 
+      SET TIPO = '".$type."', 
+      FECHAMODIFICACION = '".$date_updated."', 
+      AUDIENCIA = '".$audency."', 
+      COMPATIBILIDAD = ".$compatibility.", 
+      IDIOMA = '".$language."', COSTO = ".$cost." 
+      WHERE IDMETADATA = ".$cod_metadata."";
+      $recordSet = $objConnection->executeSQL($bd, $sentenceMetadata);
+    }
+
     //Cierra la conexión con la BD
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
@@ -157,45 +169,36 @@ class CtrMetadata
     }
 
   }
-
+  /**Eliminar Metadata */
   function delete()
   {
     //Obtiene los valores ingresados en la vista
     //material
-    $cod_material = $this->objMaterial->getCodMaterial();
+    $cod_metadata = $this->objMetadata->getCodMetadata();
 		//---------NOS CONECTAMOS A LA BASE DE DATOS-----------------------------------------------------------
     $bd = "repositorio";
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
     //--------------Se ejecuta Comando SQL-------------------------
-    //Consultar imagen del material
-    $sentenceImage = "SELECT IMAGEN FROM material WHERE IDMATERIAL =" . $cod_material . "";
-    $recordSet4 = $objConnection->executeSQL($bd, $sentenceImage);
-    $select_material = mysql_fetch_array($recordSet4);
-    $image = $select_material['IMAGEN'];
-
-    //Elimina la relacion Material con Autor
-    $sentenceRelationMA = "DELETE FROM relacionmaterialautor WHERE IDMATERIAL =" . $cod_material . "";
-    $recordSet2 = $objConnection->executeSQL($bd, $sentenceRelationMA);
-    
-    //Elimina la relacion Area con Material
-    $sentenceRelationAM = "DELETE FROM relacionareamaterial WHERE IDMATERIAL =" . $cod_material . "";
-    $recordSet3 = $objConnection->executeSQL($bd, $sentenceRelationAM);
-
-    //Elimina el material
-    $sentenceMetadata = "DELETE FROM material WHERE IDMATERIAL =" . $cod_material . "";
-    $recordSet = $objConnection->executeSQL($bd, $sentenceMetadata);
+    //Consultar el metadata del material
+    $sentenceMetadata = "SELECT METADATA FROM metadata WHERE IDMETADATA = " . $cod_metadata . "";
+    $recordSet2 = $objConnection->executeSQL($bd, $sentenceMetadata);
+    $select_metadata = mysql_fetch_array($recordSet2);
+    $metadata = $select_metadata['METADATA'];
+    //Elimina el metadata
+    $sentenceDeleteMetadata = "DELETE FROM metadata WHERE IDMETADATA =" . $cod_metadata . "";
+    $recordSet = $objConnection->executeSQL($bd, $sentenceDeleteMetadata);
     //Cierra la conexión
     $objConnection->close($link);
 
     //Borrando archivo
-    if (!unlink('../material_images/' . $image)) {
-      die("Se presentó un error borrando el archivo" . $image);
+    if (!unlink('../metadata/' . $metadata)) {
+      die("Se presentó un error borrando el archivo: " . $metadata);
     }
 
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
-    if (!$cod_material) {
+    if (!$cod_metadata) {
       die(" ERROR CON EL COMANDO SQL: " . mysql_error());
     } else {  
       //----------AL RESULTADO QUE SE VA A RETORNAR = RESULTADO DE LA select---------------
@@ -213,28 +216,28 @@ class CtrMetadata
     $objConnection = new CtrConnection();
     $link = $objConnection->connect('localhost', $bd, 'root', '');
 
-    $sentence = "SELECT m.IDMATERIAL, m.TITULO, m.DESCRIPCION, m.IMAGEN,au.IDAUTOR, au.NOMBRE AS AUTHOR,ar.IDAREA, ar.NOMBRE AS AREA 
-     FROM material m INNER JOIN relacionmaterialautor rma 
-     ON m.IDMATERIAL = rma.IDMATERIAL 
-     INNER JOIN autor au 
-     ON rma.IDAUTOR = au.IDAUTOR 
-     INNER JOIN relacionareamaterial ram 
-     ON m.IDMATERIAL = ram.IDMATERIAL 
-     INNER JOIN area ar 
-     ON ram.IDAREA = ar.IDAREA  
-     WHERE m.IDMATERIAL = " . $cod_material . "";
+    $sentence = "SELECT  
+    IDMETADATA,TIPO,FECHAINGRESO,FECHAMODIFICACION,
+    USUARIOINGRESO,AUDIENCIA,
+    COMPATIBILIDAD,IDIOMA,COSTO 
+    FROM  metadata  WHERE  IDMATERIAL =" . $cod_material . "";
     $recordSet = $objConnection->executeSQL($bd, $sentence);
         // LA FUNCI�N  mysql_fetch_array   PERMITE RECORRER EL RECORDSET (CURSOR A LA TABLA)
         // AQU� SE ASIGNA EL CONTENIDO DEL PRIMER REGISTRO DEL RECORDSET A UNA VARIABLE IDENTIFICADA COMO:
 
     $search = mysql_fetch_array($recordSet);
 
-    $this->objMaterial->setCodMaterial($search['IDMATERIAL']);
-    $this->objMaterial->setTitle($search['TITULO']);
-    $this->objMaterial->setDescription($search['DESCRIPCION']);
-    $this->objMaterial->setImage($search['IMAGEN']);
-    $this->objArea->setCodArea($search['IDAREA']);
-    $this->objArea->setName($search['AREA']);
+    $this->objMetadata->setCodMetadata($search['IDMETADATA']);
+    $this->objMetadata->setTypeMetadata($search['TIPO']);
+    $this->objMetadata->setDateCreated($search['FECHAINGRESO']);
+    $this->objMetadata->setDateUpdated($search['FECHAMODIFICACION']);
+    $this->objMetadata->setUser($search['USUARIOINGRESO']);
+    $this->objMetadata->setAudency($search['AUDIENCIA']);
+    $this->objMetadata->setCompatibility($search['COMPATIBILIDAD']);
+    $this->objMetadata->setLanguage($search['IDIOMA']);
+    $this->objMetadata->setCost($search['COSTO']);
+    $this->objMaterial->setCodMaterial($cod_material);
+
     $objConnection->close($link);
 		//--------------VERIFICAMOS SI SE REALIZO LA select--------------------------------------------------
     if (!$recordSet) {

@@ -120,7 +120,7 @@ try {
         <div class="input-group-prepend">
           <div class="input-group-text"><span><i class="fas fa-fingerprint"></i></span></div>
         </div>
-        <input type="text" class="form-control" id="pwd" name="password" placeholder="Contraseña" autocomplete="off">
+        <input type="password" class="form-control" id="pwd" name="password" placeholder="Contraseña" autocomplete="off">
       </div>
     </div>
     <button class="btn btn-lg btn-dark btn-block" style="border-radius: 25px;" name="sign-in" type="submit" value="sign-in">Ingresar</button>

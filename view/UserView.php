@@ -176,32 +176,38 @@ echo "<!DOCTYPE html>
         <div class='sidebar-sticky'>
           <ul class='nav flex-column'>
           <li class='nav-item'>
-          <a class='nav-link' href='HomeView.php'>
-            <span><i class='fas fa-home'></i></span>
-            Inicio
-          </a>
-        </li>
-        <li class='nav-item'>
-          <a class='nav-link' href='AreaView.php'>
-            <span><i class='fas fa-square-root-alt'></i></span>
-            Áreas
-          </a>
-        </li>
-        <li class='nav-item'>
-          <a class='nav-link' href='MaterialView.php'>
-            <span><i class='fas fa-box'></i></span>
-            Materiales
-          </a>
-        </li>";
-        if($_SESSION['rol'] == 1){
-          echo "
-          <li class='nav-item'>
-            <a class='nav-link active' href='UserView.php'>
-              <span><i class='fas fa-user-shield'></i></span>
-              Usuarios
-            </a>
-          </li>";
-        }
+              <a class='nav-link' href='HomeView.php'>
+                <span><i class='fas fa-home'></i></span>
+                Inicio
+              </a>
+            </li>
+            <li class='nav-item'>
+              <a class='nav-link' href='AreaView.php'>
+                <span><i class='fas fa-square-root-alt'></i></span>
+                Áreas
+              </a>
+            </li>
+            <li class='nav-item'>
+              <a class='nav-link' href='MaterialView.php'>
+                <span><i class='fas fa-box'></i></span>
+                Materiales
+              </a>
+            </li>
+            <li class='nav-item'>
+              <a class='nav-link' href='AuthorView.php'>
+                <span><i class='fas fa-users'></i></span>
+                Autores
+              </a>
+            </li>";
+            if($_SESSION['rol'] == 1){
+              echo "
+              <li class='nav-item'>
+                <a class='nav-link active' href='UserView.php'>
+                  <span><i class='fas fa-user-shield'></i></span>
+                  Usuarios
+                </a>
+              </li>";
+            }
           echo "</ul>
         </div>
       </nav>

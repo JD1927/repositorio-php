@@ -184,6 +184,12 @@ echo "<!DOCTYPE html>
                 <span><i class='fas fa-box'></i></span>
                 Materiales
               </a>
+            </li>
+            <li class='nav-item'>
+              <a class='nav-link' href='AuthorView.php'>
+                <span><i class='fas fa-users'></i></span>
+                Autores
+              </a>
             </li>";
             if($_SESSION['rol'] == 1){
               echo "

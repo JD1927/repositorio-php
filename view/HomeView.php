@@ -59,6 +59,12 @@ if (!$_SESSION["name"] && !$_SESSION["password"] && !$_SESSION["rol"]) {
                 Materiales
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="AuthorView.php">
+                <span><i class="fas fa-users"></i></span>
+                Autores
+              </a>
+            </li>
             <?
               if($_SESSION['rol'] == 1){
                 echo "

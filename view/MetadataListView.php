@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 //Inicia la sesión
 session_start();
 //Valida que dentro de la sesión estén todos los valores requeridos para acceder a la página
@@ -57,44 +57,48 @@ echo "<!DOCTYPE html>
       <nav class='col-md-2 d-none d-md-block bg-light sidebar'>
         <div class='sidebar-sticky'>
           <ul class='nav flex-column'>
-            <li class='nav-item'>
-              <a class='nav-link active' href='HomeView.php'>
-                <span><i class='fas fa-home'></i></span>
-                Inicio
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link' href='AreaView.php'>
-                <span><i class='fas fa-square-root-alt'></i></span>
-                Áreas
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link active' href='MaterialView.php'>
-                <span><i class='fas fa-box'></i></span>
-                Materiales
-              </a>
-            </li>";
-            if($_SESSION['rol'] == 1){
-              echo "
-              <li class='nav-item'>
-                <a class='nav-link' href='UserView.php'>
-                  <span><i class='fas fa-user-shield'></i></span>
-                  Usuarios
-                </a>
-              </li>";
-            }
+          <li class='nav-item'>
+          <a class='nav-link' href='HomeView.php'>
+            <span><i class='fas fa-home'></i></span>
+            Inicio
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='AreaView.php'>
+            <span><i class='fas fa-square-root-alt'></i></span>
+            Áreas
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link active' href='MaterialView.php'>
+            <span><i class='fas fa-box'></i></span>
+            Materiales
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='AuthorView.php'>
+            <span><i class='fas fa-users'></i></span>
+            Autores
+          </a>
+        </li>";
+        if($_SESSION['rol'] == 1){
+          echo "
+          <li class='nav-item'>
+            <a class='nav-link' href='UserView.php'>
+              <span><i class='fas fa-user-shield'></i></span>
+              Usuarios
+            </a>
+          </li>";
+        }
           echo "</ul>
         </div>
       </nav>
 
       <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>
         <div class='container'>
-          <form name='metadataListForm' method='GET' title='Ver tabla de materiales' action='MaterialView.php'>
-              <button type='submit' class='btn btn-success btn-block' value='materialActions' name='materialActions'>
-                Ver lista de materiales <span><i class='fas fa-table'></i><span>
-              </button>
-          </form>
+        <a href='MaterialView.php' class='btn btn-success btn-block' role='button'>
+          Ver lista de materiales <span><i class='fas fa-table'></i><span>
+        </a>
           <br>
           <table class='table table-hover table-response'>
             <thead class='thead-dark'>
@@ -127,7 +131,12 @@ echo "<!DOCTYPE html>
                 <td scope='row'>".$metadata[$i][9]."</td>
                 <td scope='row'>$".$metadata[$i][10]."</td>
                 <td>
-                  
+                  <form method='GET' action='MetadataView.php'>
+                    <input type='hidden' name='cod_m_material' value='".$metadata[$i][11]."'>
+                    <button type='submit' class='btn btn-dark btn-block'>
+                      <span><i class='fas fa-wrench'></i><span>
+                    </button>
+                    </form>
                 </td>
               </tr>";
             }

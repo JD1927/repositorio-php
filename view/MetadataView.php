@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 //Inicia la sesión
 session_start();
 //Valida que dentro de la sesión estén todos los valores requeridos para acceder a la página
@@ -16,7 +16,7 @@ include("../control/CtrMaterial.php");
 include("../model/MaterialModel.php");
 
 //Variables
-$cod_metadadata = "";
+$cod_metadata = "";
 $type = "";
 $date_created = "";
 $date_updated = "";
@@ -26,9 +26,11 @@ $compatibility = "Seleccione la compatibilidad...";
 $language = "Seleccione el idioma...";
 $cost = "";
 
-$objMaterial = new MaterialModel($_REQUEST['cod_material'], null, null, null);
+$cod_material = $_REQUEST['cod_material'];
 
-$cod_material = $objMaterial->getCodMaterial();
+$id_material = $_REQUEST['cod_m_material'];
+
+$cod_metadata =$_REQUEST['cod_d_metadata'];
 //Acciones 
 $metadata_msm = null;
 $mensaje = null;
@@ -47,7 +49,7 @@ if ($_POST["create"] == "create") {
       $filename = $_FILES['metadata']['name'];
       if (!file_exists($metadata)) {
         if (move_uploaded_file($_FILES['metadata']['tmp_name'], $metadata)) {
-          
+
           $type = $_POST['type'];
           $date_created = date('Y-m-d');
           $date_updated = date('Y-m-d');
@@ -67,8 +69,10 @@ if ($_POST["create"] == "create") {
           $objCtrMaterial->create();
           //Esta variable se usa para mostrar un mensaje de alerta
           $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
-          //Vacia los variables correspondientes al área
+
+          sleep(3);
           
+          header('Location: MaterialView.php');
     
           /* $areas = $objCtrArea->area_list();
           $length_areas = count($areas); */
@@ -88,24 +92,26 @@ if ($_POST["create"] == "create") {
   }
 }
   //select
-if ($_POST["read"] == "read") {
+if ($_REQUEST['cod_m_material'] || ($_REQUEST['read'] == 'read')) {
 
   try {
     //setting values
-    $cod_material = $_POST['cod_material'];
-    $objArea = new AreaModel(null, null, null);
+    $cod_material = $_REQUEST['cod_m_material'];
+    $objMetadata = new MetadataModel(null, null, null, null, null, null, null, null, null, null);
     $objMaterial = new MaterialModel($cod_material, null, null, null);
-    $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
+    $objCtrMetadata = new CtrMetadata($objMetadata, $objMaterial);
     //Se consulta en la base de datos el material $cod_material
-    $objCtrMaterial->read();
+    $objCtrMetadata->read();
     //Se obtienen los valores consultados del material
-    $cod_material = $objMaterial->getCodMaterial();
-    $metadata = $objMaterial->getmetadata();
-    $title = $objMaterial->getTitle();
-    $description = $objMaterial->getDescription();
-    //Se obtienen los valores consultados del área
-    $cod_area = $objArea->getCodArea();
-    $area = $objArea->getName();
+    $cod_metadata = $objMetadata->getCodMetadata();
+    $type = $objMetadata->getTypeMetadata();
+    $date_created = $objMetadata->getDateCreated();
+    $date_updated = $objMetadata->getDateUpdated();
+    $user = $objMetadata->getUser();
+    $audency = $objMetadata->getAudency();
+    $compatibility = $objMetadata->getCompatibility();
+    $language = $objMetadata->getLanguage();
+    $cost = $objMetadata->getCost();
 
     if ((!is_null($cod_material) && (!empty($cod_material)))) {
       //Esta variable se usa para mostrar un mensaje de alerta
@@ -118,86 +124,70 @@ if ($_POST["read"] == "read") {
   }
 
 }
-  //update
-if ($_POST["update"] == "update") {
-  if ($_FILES['metadata']['type'] == "metadata/jpeg" ||
-    $_FILES['metadata']['type'] == "metadata/png") {
-    try {
-      //Carpeta de destino
-      //Archivo
+ //update
+ if ($_POST["update"] == "update") { //Falta validar cuando no suben un archivo para actualizar
+
+  if ($_FILES['metadata']['size'] == 0) {
+    $filename = null;
+    $metadata_msm = null;
+  } else {
+    if ($_FILES['metadata']['type'] == "application/zip") {
       $metadata = $target_dir . basename($_FILES['metadata']['name']);
       $filename = $_FILES['metadata']['name'];
-      if (!file_exists($metadata)) {
-        if (move_uploaded_file($_FILES['metadata']['tmp_name'], $metadata)) {
-          $cod_material = $_POST['cod_material'];
-          $title = $_POST["title"];
-          $description = $_POST["description"];
-          //$cod_author = $_POST["cod_author"];
-          $cod_area = $_POST["cod_area"];
-
-          $objArea = new AreaModel($cod_area, null, null);
-          $objMaterial = new MaterialModel($cod_material, $title, $description, $filename);
-          //$objAuthor = new AuthorModel()
-          $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
-          if ($objCtrMaterial->update()) {
-            
-            //Se obtienen los valores consultados del material
-            $cod_material = $objMaterial->getCodMaterial();
-            $metadata = $objMaterial->getmetadata();
-            $title = $objMaterial->getTitle();
-            $description = $objMaterial->getDescription();
-            //Se obtienen los valores consultados del área
-            $cod_area = $objArea->getCodArea();
-            $area = $objArea->getName();
-            $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
-          } else {
-            $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
-          }
-          $objCtrMaterial->read();
-    //Se obtienen los valores consultados del material
-          $cod_material = $objMaterial->getCodMaterial();
-          $metadata = $objMaterial->getmetadata();
-          $title = $objMaterial->getTitle();
-          $description = $objMaterial->getDescription();
-    //Se obtienen los valores consultados del área
-          $cod_area = $objArea->getCodArea();
-          $area = $objArea->getName();
-
-
-        } else {
-          $metadata_msm = "¡El " . $_FILES['metadata']['name'] . " no se pudo subir satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
-        }
-      } else {
-        $metadata_msm = "¡El archivo ya existe! <span><i class='fas fa-frown'></i></span>";
+      if (!file_exists($image)) {
+        move_uploaded_file($_FILES['metadata']['tmp_name'], $metadata);
       }
-
-
-    } catch (Exception $exp) {
-      echo "ERROR ....R " . $exp->getMessage() . "\n";
+    } else {
+      $metadata_msm = "¡El " . $_FILES['metadata']['name'] . " no tiene la extensión correcta! <span><i class='fas fa-frown'></i></span>";
     }
-  } else {
-    $metadata_msm = "¡El archivo no se pudo subir satisfactoriamente! El tipo de datos es:" . $_FILES['metadata']['type'] . " <span><i class='fas fa-frown'></i></span>";
   }
 
-}
-  //delete
-if ($_POST["delete"] == "delete") {
-
   try {
-
-    $cod_material = $_POST["cod_material"];
-    $cod_area = $_POST["cod_area"];
-
-    $objArea = new AreaModel($cod_area, null, null);
+    $cod_metadata = $_POST['cod_metadata'];
+    $type = $_POST['type'];
+    $date_updated = date('Y-m-d');
+    $user = $_SESSION['name'];
+    //$filename
+    $audency = $_POST['audency'];
+    $compatibility = $_POST['compatibility'];
+    $language = $_POST['language'];
+    $cost = $_POST['cost'];
+    $cod_material = $_POST['cod_material'];
     $objMaterial = new MaterialModel($cod_material, null, null, null);
-          //$objAuthor = new AuthorModel()
-    $objCtrMaterial = new CtrMaterial($objMaterial, $objArea);
+    $objMetadata = new MetadataModel($cod_metadata,$type,$filename,null,$date_updated,$user,$audency,$compatibility,$language,$cost);
 
-    if ($objCtrMaterial->delete()) {
+    $objCtrMetadata = new CtrMetadata($objMetadata, $objMaterial);
+
+    if ($objCtrMetadata->update()) {
       $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+      sleep(3);
+      header('Location','MaterialView.php');
     } else {
       $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
     }
+  } catch (Exception $exp) {
+    echo "ERROR ....R " . $exp->getMessage() . "\n";
+  }
+}
+  //delete
+if ($_REQUEST['delete'] == 'delete') {
+
+  try {
+
+    $cod_metadata = $_REQUEST['cod_metadata'];
+    
+    $objMetadata = new MetadataModel($cod_metadata, null, null, null, null, null, null, null, null, null);
+    $objMaterial = new MaterialModel(null, null, null, null);
+    $objCtrMetadata = new CtrMetadata($objMetadata, $objMaterial);
+
+    if ($objCtrMetadata->delete()) {
+      $message = "¡La acción se realizó exitosamente! <span><i class='fas fa-check-circle'></i></span>";
+      sleep(3);
+      header('Location: MaterialView.php');
+    } else {
+      $message = "¡La acción no se pudo realizar satisfactoriamente! <span><i class='fas fa-frown'></i></span>";
+    }
+
 
   } catch (Exception $exp) {
     echo "ERROR ....R " . $exp->getMessage() . "\n";
@@ -241,39 +231,49 @@ echo "<!DOCTYPE html>
       <nav class='col-md-2 d-none d-md-block bg-light sidebar'>
         <div class='sidebar-sticky'>
           <ul class='nav flex-column'>
-            <li class='nav-item'>
-              <a class='nav-link' href='HomeView.php'>
-                <span><i class='fas fa-home'></i></span>
-                Inicio
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link' href='AreaView.php'>
-                <span><i class='fas fa-square-root-alt'></i></span>
-                Áreas
-              </a>
-            </li>
-            <li class='nav-item'>
-              <a class='nav-link active' href='MaterialView.php'>
-                <span><i class='fas fa-box'></i></span>
-                Materiales
-              </a>
-            </li>";
-            if($_SESSION['rol'] == 1){
-              echo "
-              <li class='nav-item'>
-                <a class='nav-link' href='UserView.php'>
-                  <span><i class='fas fa-user-shield'></i></span>
-                  Usuarios
-                </a>
-              </li>";
-            }
+          <li class='nav-item'>
+          <a class='nav-link' href='HomeView.php'>
+            <span><i class='fas fa-home'></i></span>
+            Inicio
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='AreaView.php'>
+            <span><i class='fas fa-square-root-alt'></i></span>
+            Áreas
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link active' href='MaterialView.php'>
+            <span><i class='fas fa-box'></i></span>
+            Materiales
+          </a>
+        </li>
+        <li class='nav-item'>
+          <a class='nav-link' href='AuthorView.php'>
+            <span><i class='fas fa-users'></i></span>
+            Autores
+          </a>
+        </li>";
+        if($_SESSION['rol'] == 1){
+          echo "
+          <li class='nav-item'>
+            <a class='nav-link' href='UserView.php'>
+              <span><i class='fas fa-user-shield'></i></span>
+              Usuarios
+            </a>
+          </li>";
+        }
           echo "</ul>
         </div>
       </nav>
 
       <main role='main' class='col-md-9 ml-sm-auto col-lg-10 px-4'>";
 echo "<div class='container'>
+          <a href='MaterialView.php' class='btn btn-success btn-block' role='button'>
+            <span><i class='fas fa-chevron-circle-left'></i><span> Volver
+          </a>
+          <br>
           <div class='card'>
             <div class='card-header' style='text-align: center;'>
               <h4>Metadata</h4>
@@ -284,14 +284,30 @@ echo "<div class='container'>
                   <div class='form-row'>
                     <div class='form-group col-md-6'>
                       <label for='cod_metadata'>Código</label>
-                      <input type='text' class='form-control' value='" . $cod_metadadata . "' name='cod_metadata' id='cod_metadata' placeholder='Código del metadata'>
+                      <input type='text' class='form-control' value='" . $cod_metadata . "' name='cod_metadata' id='cod_metadata' placeholder='Código del metadata'>
                     </div>
                     <div class='form-group col-md-6'>
                       <label for='type'>Tipo</label>
                       <input type='text' class='form-control' value='" . $type . "' name='type' id='type' placeholder='Tipo de metadata'>
                     </div>
-                  </div>
-                  <div class='form-row'>
+                  </div>";
+                  if($_REQUEST['cod_m_material']){
+                    echo "<div class='form-row'>
+                    <div class='form-group col-md-4'>
+                      <label for='date_created'>Fecha de creación</label>
+                      <input type='text' class='form-control' value='" . $date_created . "' name='date_created' id='date_created' readonly>
+                    </div>
+                    <div class='form-group col-md-4'>
+                      <label for='date_updated'>Última modificación</label>
+                      <input type='text' class='form-control' value='" . $date_updated . "' name='date_updated' id='date_updated' readonly>
+                    </div>
+                    <div class='form-group col-md-4'>
+                      <label for='user'>Usuario</label>
+                      <input type='text' class='form-control' value='" . $user . "' name='user' id='user' readonly>
+                    </div>
+                  </div>";
+                  }
+                  echo "<div class='form-row'>
                     <div class='form-group col-md-6'>
                       <label for='audency'>Audiencia</label>
                       <select id='audency' name='audency' class='form-control custom-select'>
@@ -302,9 +318,14 @@ echo "<div class='container'>
                     </div>
                     <div class='form-group col-md-6'>
                       <label for='compatibility'>Compatibilidad</label>
-                      <select id='compatibility' name='compatibility' class='form-control custom-select'>
-                        <option selected>" . $compatibility . "</option>
-                        <option value='1'>Compatible</option>
+                      <select id='compatibility' name='compatibility' class='form-control custom-select'>";
+                        if($_REQUEST['cod_m_material']){
+                          echo "<option value='".$compatibility."' selected>" . (($compatibility == true || $compatibility == 1)?'Compatible':'No Compatible') . "</option>";
+                        }else{
+                          echo "<option selected>" . $compatibility . "</option>";
+                        }
+                        
+                        echo "<option value='1'>Compatible</option>
                         <option value='0'>No compatible</option>
                       </select>
                     </div>
@@ -312,8 +333,8 @@ echo "<div class='container'>
                   <div class='form-group'>
                     <label for='metadata'>Metadata del material</label>
                     <input type='file' class='form-control-file' value='" . $metadata . "' name='metadata' id='metadata'>";
-            if ($_POST['read'] == 'read') {
-              echo "<span><summary>Los metadatos se pueden visualizar oprimiendo el botón: <i class='far fa-eye'></i></summary><span>";
+            if ($_REQUEST['cod_m_material']) {
+              echo "<span><summary>Los metadatos se pueden visualizar regresando a la opción de <b>materiales</b> y luego en <b>ver metadatos</b></summary><span>";
             }
             echo "</div>
                   
@@ -323,7 +344,9 @@ echo "<div class='container'>
                     <select id='language' name='language' class='form-control custom-select'>
                       <option selected>" . $language . "</option>
                       <option value='Español'>Español</option>
-                      <option value='Ingles'>Inglés</option>
+                      <option value='Inglés'>Inglés</option>
+                      <option value='Francés'>Francés</option>
+                      <option value='Alemán'>Alemán</option>
                     </select>
                   </div>
                   <div class='form-group col-md-6'>
